@@ -48,6 +48,10 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'karu' => [
+            'driver' => 'session',
+            'provider' => 'karus',
+        ],
     ],
 
     /*
@@ -75,6 +79,10 @@ return [
         'karyawans' => [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\Karyawan::class),
+        ],
+        'karus' => [
+            'driver' => 'eloquent',
+            'model' => env('AUTH_MODEL', App\Models\Karu::class),
         ],
 
         // 'users' => [

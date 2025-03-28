@@ -14,9 +14,12 @@
     }
     .bgheader {
         height: 180px;
-        background-image: url({{asset('tabler/static/illustrations/BG.png')}});
+        background-image: url('tabler/static/illustrations/BG.png');
         background-position: center;
         padding: 20px;
+    }
+    .image-container {
+        box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.5);
     }
 </style>
 
@@ -24,27 +27,27 @@
     <a href="/proseslogout" class="logout">
         <ion-icon name="log-out-outline"></ion-icon>
     </a>
-            <div id="user-detail">
-                <div class="avatar">
-                    @if (!empty(Auth::guard('karyawan') -> user() -> foto))
-                        @php
-                            $path = Storage::url('upload/karyawan/'.Auth::guard('karyawan') -> user() -> foto);
-                        @endphp
-                        <div class="image-container">
-                            <img src="{{url($path)}}" alt="avatar" class="center-cropped-img">
-                        </div>
-                            
-                        <!-- <img src="{{url($path)}}" alt="avatar" class="imaged w64 rounded"> -->
-                    @else
-                        <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded" style="box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.75); border: 2px solid white;">
-                    @endif
+    <div id="user-detail">
+        <div class="avatar">
+            @if (!empty(Auth::guard('karyawan') -> user() -> foto))
+                @php
+                    $path = Storage::url('upload/karyawan/'.Auth::guard('karyawan') -> user() -> foto);
+                @endphp
+                <div class="image-container">
+                    <img src="{{url($path)}}" alt="avatar" class="center-cropped-img">
                 </div>
-                <div class="mt-1" id="user-info">
-                    <h3 id="user-name">{{Auth::guard('karyawan') -> user() -> nama_lengkap}}</h3>
-                    <small id="user-role">{{Auth::guard('karyawan') -> user() -> jabatan}}</small>
-                </div>
-            </div>
+                    
+                <!-- <img src="{{url($path)}}" alt="avatar" class="imaged w64 rounded"> -->
+            @else
+                <img src="assets/img/sample/avatar/avatar1.jpg" alt="avatar" class="imaged w64 rounded" style="box-shadow: 3px 3px 10px 0px rgba(0, 0, 0, 0.75); border: 2px solid white;">
+            @endif
         </div>
+        <div class="mt-1" id="user-info">
+            <h3 id="user-name">{{Auth::guard('karyawan') -> user() -> nama_lengkap}}</h3>
+            <small id="user-role">{{Auth::guard('karyawan') -> user() -> jabatan}}</small>
+        </div>
+    </div>
+</div>
 
         <div class="section" id="menu-section">
             <div class="card">
@@ -141,7 +144,7 @@
 
                     <!-- Fungsi menampilkan info absensi pulang -->
                     <div class="col-6">
-                        @php  
+                        @php
                             if ($presensihariini && $presensihariini->foto_out) {
                                 $path = Storage::url('upload/absensi/' . $presensihariini->foto_out);
                             } else {
@@ -187,8 +190,32 @@
                 </div>
             </div>
 
+            <!-- Fungsi menghapus absensi datang -->
+            <div class="mb-2">
+                @if($presensihariini && $presensihariini->jam_in)
+                    <form action="{{ route('presensi.hapusDatang', $presensihariini->id) }}" method="POST"
+                        onsubmit="return confirm('Yakin ingin menghapus absensi datang?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-success btn-block">Hapus Absensi Datang</button>
+                    </form>
+                @endif
+            </div>
+
             <!-- Fungsi menghapus absensi pulang -->
-            <div class="row mb-2">
+            <div class="mb-2">
+                @if($presensihariini && $presensihariini->jam_out)
+                    <form action="{{ route('presensi.hapusPulang', $presensihariini->id) }}" method="POST"
+                        onsubmit="return confirm('Yakin ingin menghapus absensi pulang?');">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn btn-danger btn-block">Hapus Absensi Pulang</button>
+                    </form>
+                @endif
+            </div>
+
+            <!-- Fungsi menghapus absensi pulang -->
+            {{-- <div class="row mb-2">
                 <div class="col-12">
                     <script>
                         function hapusabsenpulang(event) {
@@ -218,7 +245,7 @@
                             </div>  
                         </a>
                 </div>
-            </div>
+            </div> --}}
 
             <div id="rekappresensi">
                 <h3>Rekap Presensi Bulan {{$namabulan[(int)$bulanini]}} {{$tahunini}}</h3>

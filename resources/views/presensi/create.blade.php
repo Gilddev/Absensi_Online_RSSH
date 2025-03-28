@@ -82,7 +82,7 @@
                     Absen Pulang
                 </button>
             @elseif (!empty($d -> jam_in) && !empty($d -> jam_out))
-                <span>Anda Sudah Absen Hari Ini. Terima Kasih</span>
+                <p class="text-center align-middle mt-3">Anda Sudah Absen Hari Ini. Terima Kasih</p>
             @endif
         @endforeach
 

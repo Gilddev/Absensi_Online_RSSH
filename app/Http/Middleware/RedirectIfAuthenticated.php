@@ -28,6 +28,9 @@ class RedirectIfAuthenticated
             if (Auth::guard('user')->check()) {
                 return redirect(RouteServiceProvider::HOMEADMIN);
             }
+            if (Auth::guard('karu')->check()) {
+                return redirect(RouteServiceProvider::HOMEKARU);
+            }
         }
 
         return $next($request);

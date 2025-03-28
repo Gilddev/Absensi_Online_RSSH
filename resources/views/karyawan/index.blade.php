@@ -1,5 +1,14 @@
-@extends('layouts.admin.tabler')
+@php
+    if (Auth::guard('karu')->check()) {
+        $layout = 'layouts.karu.tabler';
+    } elseif (Auth::guard('user')->check()){ 
+        $layout = 'layouts.admin.tabler';
+    }
+@endphp
+@extends($layout)
 @section('content')
+
+{{-- {{ dd(Auth::guard()) }} --}}
 
 <div class="page-header d-print-none">
     <div class="container-xl">
@@ -213,7 +222,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="row">
                     <div class="col-12">
                         <select name="kode_ruangan" id="kode_ruangan" class="form-select">

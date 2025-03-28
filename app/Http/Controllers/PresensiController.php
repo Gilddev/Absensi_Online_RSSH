@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Karyawan;
+use App\Models\Presensi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -158,6 +159,69 @@ class PresensiController extends Controller
         }
     }
 
+    public function hapusAbsensiDatang($id)
+    {
+        // Ambil data presensi berdasarkan ID dan tanggal hari ini
+        $presensi = Presensi::where('id', $id)
+                            ->whereDate('tgl_presensi', now()->toDateString()) // Hanya untuk hari ini
+                            ->first();
+        
+        // Hapus file foto_out jika ada
+        if ($presensi->foto_in) {
+            $filePath = public_path('storage/upload/absensi/' . $presensi->foto_in);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+
+        // Hapus file foto_out jika ada
+        if ($presensi->foto_out) {
+            $filePath = public_path('storage/upload/absensi/' . $presensi->foto_out);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+    
+        // Jika data tidak ditemukan atau absensi pulang belum dilakukan
+        if (!$presensi || !$presensi->jam_in) {
+            return redirect()->back()->with('error', 'Tidak ada absensi datang untuk dihapus.');
+        }
+    
+        // Hapus data presensi dari database
+        $presensi->delete();
+    
+        return redirect()->back()->with('success', 'Absensi pulang berhasil dihapus.');
+    }
+
+    public function hapusAbsensiPulang($id)
+    {
+        // Ambil data presensi berdasarkan ID dan tanggal hari ini
+        $presensi = Presensi::where('id', $id)
+                            ->whereDate('tgl_presensi', now()->toDateString()) // Hanya untuk hari ini
+                            ->first();
+        
+        // Hapus file foto_out jika ada
+        if ($presensi->foto_out) {
+            $filePath = public_path('storage/upload/absensi/' . $presensi->foto_out);
+            if (file_exists($filePath)) {
+                unlink($filePath);
+            }
+        }
+    
+        // Jika data tidak ditemukan atau absensi pulang belum dilakukan
+        if (!$presensi || !$presensi->jam_out) {
+            return redirect()->back()->with('error', 'Tidak ada absensi pulang untuk dihapus.');
+        }
+    
+        // Update field jam_out, foto_out, lokasi_out menjadi null
+        $presensi->update([
+            'jam_out' => null,
+            'foto_out' => null,
+            'lokasi_out' => null
+        ]);
+    
+        return redirect()->back()->with('success', 'Absensi pulang berhasil dihapus.');
+    }
 
     // menghitung jarak user dari radius lokasi kantor
     function distance($lat1, $lon1, $lat2, $lon2){
@@ -397,84 +461,93 @@ class PresensiController extends Controller
     }
 
     public function cetakrekap(Request $request){
-        $bulan = $request -> bulan;
-        $tahun = $request -> tahun;
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
         $kode_ruangan = $request->kode_ruangan;
         $dari =  $tahun . "-" . $bulan . "-01";
         $sampai = date("Y-m-t", strtotime($dari));
         $namabulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", 
         "Oktober", "November", "Desember"];
-
+    
         $select_date = "";
         $field_date = "";
         $i = 1;
         while (strtotime($dari) <= strtotime($sampai)) {
             $rangetanggal[] = $dari;
             $select_date .= "MAX(IF(tgl_presensi = '$dari', CONCAT(
-                IFNULL (jam_in, 'NA'), '|',
-                IFNULL (jam_out, 'NA'), '|',
-                IFNULL (presensi.STATUS, 'NA'), '|',
-                IFNULL (nama_jam_kerja, 'NA'), '|',
-                IFNULL (jam_masuk, 'NA'), '|',
-                IFNULL (jam_pulang, 'NA'), '|',
-                IFNULL (presensi.kode_izin, 'NA'), '|',
-                IFNULL (keterangan, 'NA'), '|'
+                IFNULL(jam_in, 'NA'), '|',
+                IFNULL(jam_out, 'NA'), '|',
+                IFNULL(presensi.STATUS, 'NA'), '|',
+                IFNULL(nama_jam_kerja, 'NA'), '|',
+                IFNULL(jam_masuk, 'NA'), '|',
+                IFNULL(jam_pulang, 'NA'), '|',
+                IFNULL(presensi.kode_izin, 'NA'), '|',
+                IFNULL(keterangan, 'NA'), '|'
             ),NULL)) as tgl_" . $i . ",";
-
+    
             $field_date .= "tgl_" . $i . ",";
             $i++;
             $dari = date("Y-m-d", strtotime("+1 day", strtotime($dari)));
         }
-        // dd($select_date);
         
         $jmlhari = count($rangetanggal);
         $lastrange = $jmlhari - 1;
         $sampai =  $rangetanggal[$lastrange];
-        if($jmlhari == 30){
+        if ($jmlhari == 30) {
             array_push($rangetanggal, NULL);
-        }elseif($jmlhari == 29){
+        } elseif ($jmlhari == 29) {
             array_push($rangetanggal, NULL, NULL);
-        }elseif($jmlhari == 28){
+        } elseif ($jmlhari == 28) {
             array_push($rangetanggal, NULL, NULL, NULL);
         }
-
+    
         $query = Karyawan::query();
-        $query->selectRaw(
-            "$field_date karyawan.nik, nama_lengkap, jabatan, kode_ruangan"
-        );
-
+        $query->selectRaw("$field_date karyawan.nik, nama_lengkap, jabatan, kode_ruangan, IFNULL(jumlah_wd, 0) as jumlah_wd");
+    
+        // JOIN dengan data presensi
         $query->leftJoin(
             DB::raw("(
-            SELECT     
-            $select_date
-            presensi.nik   
-            
-            FROM presensi
-            LEFT JOIN jam_kerja ON presensi.kode_jam_kerja = jam_kerja.kode_jam_kerja
-            LEFT JOIN pengajuan_izin ON presensi.kode_izin = pengajuan_izin.kode_izin
-            WHERE tgl_presensi Between '$rangetanggal[0]' AND '$sampai'
-            GROUP BY nik
+                SELECT     
+                    $select_date
+                    presensi.nik   
+                FROM presensi
+                LEFT JOIN jam_kerja ON presensi.kode_jam_kerja = jam_kerja.kode_jam_kerja
+                LEFT JOIN pengajuan_izin ON presensi.kode_izin = pengajuan_izin.kode_izin
+                WHERE tgl_presensi BETWEEN '$rangetanggal[0]' AND '$sampai'
+                GROUP BY nik
             ) presensi"),
-             function($join){
+            function($join){
                 $join->on('karyawan.nik', '=', 'presensi.nik');
-             }
+            }
         );
-
-        // dijalankan jika pilihan cetak rekap semua ruangan
+    
+        // JOIN dengan konfigurasi_jam_kerja untuk menghitung jumlah WD (hari kerja)
+        $query->leftJoin(
+            DB::raw("(SELECT nik, COUNT(kode_jam_kerja) as jumlah_wd 
+                FROM konfigurasi_jam_kerja 
+                WHERE kode_jam_kerja IS NOT NULL 
+                AND MONTH(tanggal_kerja) = '$bulan' 
+                AND YEAR(tanggal_kerja) = '$tahun'
+                GROUP BY nik) wd"),
+            function($join){
+                $join->on('karyawan.nik', '=', 'wd.nik');
+            }
+        );
+    
+        // Filter berdasarkan kode ruangan jika dipilih
         if (!empty($kode_ruangan)){
             $query->where('kode_ruangan', $kode_ruangan);
         }
         $query->orderBy('nama_lengkap');
         $rekap = $query->get();
-
-        // dd($rekap);
-
+    
         return view('presensi.cetakrekap', compact('bulan', 'tahun', 'rekap', 'namabulan', 'rangetanggal', 'jmlhari'));
     }
+    
 
     public function izinsakit(Request $request){
         $query = Pengajuanizin::query();
-        $query -> select('kode_izin', 'tgl_izin_dari', 'tgl_izin_sampai', 'pengajuan_izin.nik', 'nama_lengkap', 'kode_ruangan', 'status', 'status_approved', 'keterangan');
+        $query -> select('kode_izin', 'tgl_izin_dari', 'tgl_izin_sampai', 'pengajuan_izin.nik', 'nama_lengkap', 'kode_ruangan', 'status', 'status_approved', 'keterangan', 'file_surat_izin');
         $query -> join('karyawan', 'pengajuan_izin.nik', '=', 'karyawan.nik');
         if(!empty($request -> dari) && !empty($request -> sampai)){
             $query -> whereBetween('tgl_izin_dari', [$request -> dari, $request -> sampai]);

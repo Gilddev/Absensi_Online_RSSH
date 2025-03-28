@@ -96,4 +96,8 @@ class DashboardController extends Controller
 
         return view('dashboard.dashboardadmin', compact('rekappresensi', 'rekappresensibulan', 'bulanini', 'namabulan'));
     }
+
+    public function dashboardkaru(){
+        return view('dashboard.dashboardkaru');
+    }
 }

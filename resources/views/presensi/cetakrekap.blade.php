@@ -101,7 +101,8 @@
             <th rowspan="2">H</th>
             <th rowspan="2">I</th>
             <th rowspan="2">S</th>
-            <th rowspan="2">TH</th>
+            {{-- <th rowspan="2">TH</th> --}}
+            <th rowspan="2">WD</th>
         </tr>
         <tr>
             @foreach ($rangetanggal as $d)
@@ -114,44 +115,47 @@
             <tr>
                 <td>{{ $r->nama_lengkap }}</td>
                 <td>{{ $r->kode_ruangan }}</td>
-                    <?php
-                        $jml_hadir = 0;
-                        $jml_izin = 0;
-                        $jml_sakit = 0;
-                        $jml_tidakhadir = 0;
-                        for($i = 1; $i <= $jmlhari; $i++){
-                            $tgl = 'tgl_' . $i;
-                            $datapresensi = explode("|", $r->$tgl);
-                            if ($r->$tgl != NULL) {
-                                $status = $datapresensi[2];
-                                $status2 = $datapresensi[3];
-                                $status3 = $datapresensi[0];
-                                $status4 = $datapresensi[1];
-                            }else{
-                                $status = "";
-                                $status2 = "";
-                                $status3 = "";
-                                $status4 = "";
-                            }
-
-                            if ($status == "h") {
-                                $jml_hadir += 1;
-                            }
-                            if ($status == "i") {
-                                $jml_izin += 1;
-                            }
-                            if ($status == "s") {
-                                $jml_sakit += 1;
-                            }
-                            if (empty($status)) {
-                                $jml_tidakhadir += 1;
-                            }
-
+                <?php
+                    $jml_hadir = 0;
+                    $jml_izin = 0;
+                    $jml_sakit = 0;
+                    $jml_tidakhadir = 0;
+                    $jml_waktu_dinas = 0;
+                    
+                    for($i = 1; $i <= $jmlhari; $i++){
+                        $tgl = 'tgl_' . $i;
+                        $datapresensi = explode("|", $r->$tgl);
+                        
+                        if ($r->$tgl != NULL) {
+                            $status = $datapresensi[2];  // Status (H, I, S, dll.)
+                            $status2 = $datapresensi[3]; // Shift (Pagi, Siang, Malam) sesuai nama jam dinas
+                            $status3 = $datapresensi[0]; // Jam Masuk
+                            $status4 = $datapresensi[1]; // Jam Pulang
+                        } else {
+                            $status = "";
+                            $status2 = "";
+                            $status3 = "";
+                            $status4 = "";
+                        }
+                    
+                        // Hitung jumlah kehadiran
+                        if ($status == "h") {
+                            $jml_hadir += 1;
+                        }
+                        if ($status == "i") {
+                            $jml_izin += 1;
+                        }
+                        if ($status == "s") {
+                            $jml_sakit += 1;
+                        }
+                        // if (empty($status)) {
+                        //     $jml_tidakhadir += 1;
+                        // }
                     ?>
                     <td style="font-size:8px;">
                         {{$status}}
                         {{$status2}}
-                        <span style="color: {{ ($status2 == "PAGI" && $status3 > "08:00:00") || ($status2 == "SIANG" && $status3 > "14:00:00") || ($status2 == "MALAM" && $status3 > "21:00:00") ? "red" : ""}}">
+                        <span style="color: {{ ($status2 == "PAGI" && $status3 > "08:10:00") || ($status2 == "SIANG" && $status3 > "14:10:00") || ($status2 == "MALAM" && $status3 > "21:10:00") ? "red" : ""}}">
                             {{$status3}}
                         </span>
                         {{$status4}}
@@ -162,7 +166,9 @@
                     <td>{{ !empty($jml_hadir) ? $jml_hadir : "" }}</td>
                     <td>{{ !empty($jml_izin) ? $jml_izin : "" }}</td>
                     <td>{{ !empty($jml_sakit) ? $jml_sakit : "" }}</td>
-                    <td>{{ !empty($jml_tidakhadir) ? $jml_tidakhadir : "" }}</td>
+                    {{-- <td>{{ !empty($jml_tidakhadir) ? $jml_tidakhadir : "" }}</td> --}}
+                    {{-- <td>{{ !empty($jml_waktu_dinas) ? $jml_waktu_dinas : "" }}</td> --}}
+                    <td>{{ $r->jumlah_wd }}</td>
             </tr>
         @endforeach
     </table>

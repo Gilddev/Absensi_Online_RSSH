@@ -1,4 +1,11 @@
-@extends('layouts.admin.tabler')
+@php
+    if (Auth::guard('karu')->check()) {
+        $layout = 'layouts.karu.tabler';
+    } elseif (Auth::guard('user')->check()){ 
+        $layout = 'layouts.admin.tabler';
+    }
+@endphp
+@extends($layout)
 @section('content')
 
 <div class="page-header d-print-none">
