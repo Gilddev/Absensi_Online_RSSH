@@ -25,6 +25,13 @@ route::middleware(['guest:user'])->group(function(){
     route::post('/prosesloginadmin', [AuthController::class, 'prosesloginadmin']);
 });
 
+route::middleware(['guest:karu'])->group(function(){
+    route::get('/panelkaru', function(){
+        return view('auth.loginkaru');
+    })->name('loginkaru');
+    route::post('/prosesloginkaru', [AuthController::class, 'prosesloginkaru']);
+});
+
 route::middleware(['auth:karyawan'])->group(function(){
     Route::get('/dashboard', [DashboardController::class, 'index']);
     Route::get('/proseslogout', [AuthController::class, 'proseslogout']);
@@ -32,6 +39,8 @@ route::middleware(['auth:karyawan'])->group(function(){
     //presensi
     Route::get('/presensi/create', [PresensiController::class, 'create']);
     Route::post('/presensi/store', [PresensiController::class, 'store']);
+    Route::delete('/presensi/hapus-datang/{id}', [PresensiController::class, 'hapusAbsensiDatang'])->name('presensi.hapusDatang');
+    Route::delete('/presensi/hapus-pulang/{id}', [PresensiController::class, 'hapusAbsensiPulang'])->name('presensi.hapusPulang');
 
     //edit profile
     Route::get('/editprofile', [PresensiController::class,'editprofile']);
@@ -45,7 +54,7 @@ route::middleware(['auth:karyawan'])->group(function(){
     Route::get('/presensi/izin', [PresensiController::class, 'izin']);
     Route::get('/presensi/buatizin', [PresensiController::class,'buatizin']);
     Route::post('/presensi/storeizin', [PresensiController::class,'storeizin']);
-    Route::post('/presensi/cekpengajuanizin', [PresensiController::Class, 'cekpengajuanizin']);
+    Route::post('/presensi/cekpengajuanizin', [PresensiController::class, 'cekpengajuanizin']);
 
     //izin absen
     Route::get('/izinabsen', [IzinabsenController::class, 'create']);
@@ -67,17 +76,35 @@ route::middleware(['auth:karyawan'])->group(function(){
     // Route::get('/download/{filename}', [FileController::class, 'downloadFile']);
 });
 
+Route::middleware(['auth:karu']) -> group(function(){
+    Route::get('/panelkaru/dashboardkaru', [DashboardController::class, 'dashboardkaru']);
+    Route::get('/proseslogoutkaru', [AuthController::class, 'proseslogoutkaru']);
+
+    //karyawan
+    // Route::get('/karyawan', [KaryawanController::class, 'index']);
+    // Route::post('/karyawan/store', [KaryawanController::class, 'store']);
+    // Route::post('/karyawan/edit', [KaryawanController::class, 'edit']);
+    // Route::post('/karyawan/{nik}/update', [KaryawanController::class, 'update']);
+    // Route::post('/karyawan/{nik}/delete', [KaryawanController::class, 'delete']);
+    // Route::post('/karyawan/{nik}/resetpassword', [KaryawanController::class, 'resetpassword']);
+
+    // //konfigurasi jam kerja
+    // Route::get('/konfigurasi/{nik}/setjamkerja', [KonfigurasiController::class, 'setjamkerja']);
+    // Route::post('/konfigurasi/storesetjamkerja', [KonfigurasiController::class, 'storesetjamkerja']);
+    // Route::post('/konfigurasi/updatesetjamkerja', [KonfigurasiController::class, 'updatesetjamkerja']);
+});
+
 Route::middleware(['auth:user']) -> group(function(){
     Route::get('/panel/dashboardadmin', [DashboardController::class, 'dashboardadmin']);
     Route::get('/proseslogoutadmin', [AuthController::class, 'proseslogoutadmin']);
 
     //karyawan
-    Route::get('/karyawan', [KaryawanController::class, 'index']);
-    Route::post('/karyawan/store', [KaryawanController::class, 'store']);
-    Route::post('/karyawan/edit', [KaryawanController::class, 'edit']);
-    Route::post('/karyawan/{nik}/update', [KaryawanController::class, 'update']);
-    Route::post('/karyawan/{nik}/delete', [KaryawanController::class, 'delete']);
-    Route::post('/karyawan/{nik}/resetpassword', [KaryawanController::class, 'resetpassword']);
+    // Route::get('/karyawan', [KaryawanController::class, 'index']);
+    // Route::post('/karyawan/store', [KaryawanController::class, 'store']);
+    // Route::post('/karyawan/edit', [KaryawanController::class, 'edit']);
+    // Route::post('/karyawan/{nik}/update', [KaryawanController::class, 'update']);
+    // Route::post('/karyawan/{nik}/delete', [KaryawanController::class, 'delete']);
+    // Route::post('/karyawan/{nik}/resetpassword', [KaryawanController::class, 'resetpassword']);
 
     //ruangan
     Route::get('/ruangan', [RuanganController::class, 'index']);
@@ -98,21 +125,36 @@ Route::middleware(['auth:user']) -> group(function(){
     Route::post('/presensi/cetaklaporan', [PresensiController::class, 'cetaklaporan']);
     Route::get('/presensi/rekap', [PresensiController::class, 'rekap']);
     Route::post('/presensi/cetakrekap', [PresensiController::class, 'cetakrekap']);
-    Route::get('/presensi/izinsakit', [PresensiController::Class, 'izinsakit']);
-    Route::post('/presensi/approveizinsakit', [PresensiController::Class, 'approveizinsakit']);
-    Route::get('/presensi/{kode_izin}/batalkanizinsakit', [PresensiController::Class, 'batalkanizinsakit']);
+    Route::get('/presensi/izinsakit', [PresensiController::class, 'izinsakit']);
+    Route::post('/presensi/approveizinsakit', [PresensiController::class, 'approveizinsakit']);
+    Route::get('/presensi/{kode_izin}/batalkanizinsakit', [PresensiController::class, 'batalkanizinsakit']);
 
     //konfigurasi
-    Route::get('/konfigurasi/lokasikantor', [KonfigurasiController::Class, 'lokasikantor']);
-    Route::post('/konfigurasi/updatelokasikantor', [KonfigurasiController::Class, 'updatelokasikantor']);
+    Route::get('/konfigurasi/lokasikantor', [KonfigurasiController::class, 'lokasikantor']);
+    Route::post('/konfigurasi/updatelokasikantor', [KonfigurasiController::class, 'updatelokasikantor']);
     
     //konfigurasi jam kerja
-    Route::get('/konfigurasi/jamkerja', [KonfigurasiController::Class, 'jamkerja']);
-    Route::post('/konfigurasi/storejamkerja', [KonfigurasiController::Class, 'storejamkerja']);
-    Route::post('/konfigurasi/editjamkerja', [KonfigurasiController::Class, 'editjamkerja']);
-    Route::post('/konfigurasi/updatejamkerja', [KonfigurasiController::Class, 'updatejamkerja']);
-    Route::post('/konfigurasi/{kode_jam_kerja}/delete', [KonfigurasiController::Class, 'deletejamkerja']);
-    Route::get('/konfigurasi/{nik}/setjamkerja', [KonfigurasiController::Class, 'setjamkerja']);
-    Route::post('/konfigurasi/storesetjamkerja', [KonfigurasiController::Class, 'storesetjamkerja']);
-    Route::post('/konfigurasi/updatesetjamkerja', [KonfigurasiController::Class, 'updatesetjamkerja']);
+    Route::get('/konfigurasi/jamkerja', [KonfigurasiController::class, 'jamkerja']);
+    Route::post('/konfigurasi/storejamkerja', [KonfigurasiController::class, 'storejamkerja']);
+    Route::post('/konfigurasi/editjamkerja', [KonfigurasiController::class, 'editjamkerja']);
+    Route::post('/konfigurasi/updatejamkerja', [KonfigurasiController::class, 'updatejamkerja']);
+    Route::post('/konfigurasi/{kode_jam_kerja}/delete', [KonfigurasiController::class, 'deletejamkerja']);
+    // Route::get('/konfigurasi/{nik}/setjamkerja', [KonfigurasiController::class, 'setjamkerja']);
+    // Route::post('/konfigurasi/storesetjamkerja', [KonfigurasiController::class, 'storesetjamkerja']);
+    // Route::post('/konfigurasi/updatesetjamkerja', [KonfigurasiController::class, 'updatesetjamkerja']);
 });
+
+Route::middleware(['multi_auth'])->group(function () {
+    Route::get('/karyawan', [KaryawanController::class, 'index']);
+    Route::post('/karyawan/store', [KaryawanController::class, 'store']);
+    Route::post('/karyawan/edit', [KaryawanController::class, 'edit']);
+    Route::post('/karyawan/{nik}/update', [KaryawanController::class, 'update']);
+    Route::post('/karyawan/{nik}/delete', [KaryawanController::class, 'delete']);
+    Route::post('/karyawan/{nik}/resetpassword', [KaryawanController::class, 'resetpassword']);
+
+    //konfigurasi jam kerja
+    Route::get('/konfigurasi/{nik}/setjamkerja', [KonfigurasiController::class, 'setjamkerja'])->name('edit.setjamkerjakaryawan');
+    Route::post('/konfigurasi/storesetjamkerja', [KonfigurasiController::class, 'storesetjamkerja']);
+    Route::post('/konfigurasi/updatesetjamkerja', [KonfigurasiController::class, 'updatesetjamkerja']);
+});
+

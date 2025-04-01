@@ -13,7 +13,7 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
-    <title>RSSH Administrator</title>
+    <title>RSSH Kepala Ruangan</title>
     <!-- CSS files -->
     <link href="{{asset('tabler/dist/css/tabler.min.css?1692870487')}}" rel="stylesheet"/>
     <link href="{{asset('tabler/dist/css/tabler-flags.min.css?1692870487')}}" rel="stylesheet"/>
@@ -39,13 +39,13 @@
   <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Mengisi form dengan data dari local storage
-            if(localStorage.getItem('email')) {
-                document.getElementById('email').value = localStorage.getItem('email');
+            if(localStorage.getItem('username')) {
+                document.getElementById('username').value = localStorage.getItem('username');
             }
 
             // Menyimpan data ke local storage saat input berubah
-            document.getElementById('email').addEventListener('input', function() {
-                localStorage.setItem('email', this.value);
+            document.getElementById('username').addEventListener('input', function() {
+                localStorage.setItem('username', this.value);
             });
         });
     </script>
@@ -61,18 +61,18 @@
               </div>
               <div class="card card-md">
                 <div class="card-body">
-                  <h1 class="h1 text-center mb-4">Administrator Login</h1>
-                  <h4 class="h4 text-center mb-4">Silahkan login dengan akun administrator anda</h4>
+                  <h1 class="h1 text-center mb-4">Kepala Ruangan Login</h1>
+                  <h4 class="h4 text-center mb-4">Silahkan login dengan akun Kepala Ruangan anda</h4>
                   @if (Session::get('warning'))
                   <div class="alert alert-warning">
                     <p>{{Session::get('warning')}}</p>
                   </div>
                   @endif
-                  <form action="/prosesloginadmin" method="post" autocomplete="off" novalidate>
+                  <form action="/prosesloginkaru" method="post" autocomplete="off" novalidate>
                     @csrf
                     <div class="mb-3">
-                      <label class="form-label">Email</label>
-                      <input type="email" id="email" name="email" class="form-control" placeholder="Email" autocomplete="on">
+                      <label class="form-label">Username</label>
+                      <input type="username" id="username" name="username" class="form-control" placeholder="Username" autocomplete="on">
                     </div>
                     <div class="mb-2">
                       <label class="form-label">
@@ -112,7 +112,7 @@
 
                     <div align="left">
                         <br>
-                        <a href="/panelkaru">Login Kepala Ruangan</a>
+                        <a href="/panel">Login Administrator</a>
                         <br>
                         <a href="/">Absensi Karyawan</a>
                     </div>

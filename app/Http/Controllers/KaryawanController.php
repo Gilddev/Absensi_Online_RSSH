@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Karyawan;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Auth;
 
 class KaryawanController extends Controller
 {
@@ -33,37 +34,81 @@ class KaryawanController extends Controller
     //     return view('karyawan.index', compact('karyawan', 'ruangan'));
     // }
 
-    public function index(Request $request){
-        // Fungsi untuk pencarian sesuai nama dan ruangan di dashboard admin
+    // public function index(Request $request){
+
+    //     // Fungsi untuk pencarian sesuai nama dan ruangan di dashboard admin
+    //     $query = Karyawan::query();
+    //     $query->select('karyawan.*', 'nama_ruangan');
+    //     $query->join('ruangan', 'karyawan.kode_ruangan', '=', 'ruangan.kode_ruangan');
+    //     $query->orderBy('nama_lengkap');
+
+    //     // if (!empty($request->nama_karyawan)) {
+    //     //     $query->where('nama_lengkap', 'like', '%' . $request->nama_karyawan . '%');
+    //     // }
+
+    //     // Cek apakah filter nama_karyawan diisi
+    //     if (!empty($request->nama_karyawan)) {
+    //         $query->where('nama_lengkap', 'like', '%' . $request->nama_karyawan . '%');
+    //     }
+        
+    //     // Cek apakah filter kode_ruangan diisi
+    //     if (!empty($request->kode_ruangan)) {
+    //         $query->where('karyawan.kode_ruangan', $request->kode_ruangan);
+    //     }
+
+    //     // Menambahkan parameter pencarian ke pagination
+    //     $karyawan = $query->paginate(5)->appends([
+    //         'nama_lengkap' => $request->nama_karyawan,
+    //         'kode_ruangan' => $request->kode_ruangan
+    //     ]);
+
+    //     $ruangan = DB::table('ruangan')->get();
+
+    //     return view('karyawan.index', compact('karyawan', 'ruangan'));
+    // }
+
+    public function index(Request $request)
+    {
+        // Inisialisasi query untuk mengambil data karyawan
         $query = Karyawan::query();
         $query->select('karyawan.*', 'nama_ruangan');
         $query->join('ruangan', 'karyawan.kode_ruangan', '=', 'ruangan.kode_ruangan');
         $query->orderBy('nama_lengkap');
 
-        // if (!empty($request->nama_karyawan)) {
-        //     $query->where('nama_lengkap', 'like', '%' . $request->nama_karyawan . '%');
-        // }
+        // Cek hak akses
+        if (Auth::guard('karu')->check()) {
+            // Jika yang login adalah karu, ambil data unitnya
+            $karu = Auth::guard('karu')->user();
 
-        // Cek apakah filter nama_karyawan diisi
+            // Filter hanya karyawan dari unit kepala ruangan (karu) yang sedang login
+            $query->where('karyawan.kode_ruangan', $karu->kode_ruangan);
+        } elseif (!Auth::guard('user')->check()) {
+            // Jika bukan admin atau karu, redirect ke login
+            return redirect()->route('login')->with('error', 'Silakan login terlebih dahulu.');
+        }
+
+        // Filter berdasarkan nama karyawan jika ada input pencarian
         if (!empty($request->nama_karyawan)) {
             $query->where('nama_lengkap', 'like', '%' . $request->nama_karyawan . '%');
         }
 
-        // Cek apakah filter kode_ruangan diisi
+        // Filter berdasarkan kode ruangan jika ada input pencarian
         if (!empty($request->kode_ruangan)) {
             $query->where('karyawan.kode_ruangan', $request->kode_ruangan);
         }
 
         // Menambahkan parameter pencarian ke pagination
-        $karyawan = $query->paginate(5)->appends([
+        $karyawan = $query->paginate(10)->appends([
             'nama_lengkap' => $request->nama_karyawan,
             'kode_ruangan' => $request->kode_ruangan
         ]);
 
+        // Mengambil daftar ruangan untuk filter di tampilan
         $ruangan = DB::table('ruangan')->get();
 
         return view('karyawan.index', compact('karyawan', 'ruangan'));
     }
+
 
     public function store(Request $request){
         $nik = $request -> nik;

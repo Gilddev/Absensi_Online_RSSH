@@ -9,6 +9,9 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+
+    // Proses login dan logout karyawan
+
     public function proseslogin(Request $request){
         if(Auth::guard('karyawan')->attempt(['nik' => $request->nik, 'password' => $request->password]))
         {
@@ -26,6 +29,8 @@ class AuthController extends Controller
         }
     }
 
+    // Proses login dan logout administrator
+
     public function prosesloginadmin(Request $request){
         if(Auth::guard('user')->attempt(['email' => $request->email, 'password' => $request->password]))
         {
@@ -40,6 +45,25 @@ class AuthController extends Controller
         if(Auth::guard('user')->check()){
             Auth::guard('user')->logout();
             return redirect('/panel');
+        }
+    }
+
+    // Proses login dan logout karu
+
+    public function prosesloginkaru(Request $request){
+        if(Auth::guard('karu')->attempt(['username' => $request->username, 'password' => $request->password]))
+        {
+            // echo "Berhasil Login";
+            return redirect('/panelkaru/dashboardkaru');
+        }else{
+            return redirect('/panelkaru')->with(['warning'=>'Username / Password Salah']);
+        }
+    }
+
+    public function proseslogoutkaru(){
+        if(Auth::guard('karu')->check()){
+            Auth::guard('karu')->logout();
+            return redirect('/panelkaru');
         }
     }
 }
