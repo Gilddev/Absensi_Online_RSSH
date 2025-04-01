@@ -87,53 +87,12 @@
         @endforeach
 
         @else
-        <!-- <div align="center" style="display:block">
-            <h3 align="center">Pilih Waktu Dinas :</h3>
-            <form>
-                <input type="radio" id="pagi" name="waktuDinas" value="Pagi" onclick="myFunction(this.value)">
-                <label for="pagi">PAGI</label>
-                <input type="radio" id="siang" name="waktuDinas" value="Siang" onclick="myFunction(this.value)">
-                <label for="siang">SIANG</label>
-                <input type="radio" id="malam" name="waktuDinas" value="Malam" onclick="myFunction(this.value)">
-                <label for="malam">MALAM</label><br>
-                <input type="text" id="dinas" hidden>
-            </form>
-        </div> -->
+
         <button id="takeabsen" class="btn btn-primary btn-block mt-1">
             <ion-icon name="camera-outline"></ion-icon>
             Absen Masuk
         </button>
         @endif
-
-        <!-- @foreach ($cekkondisi as $d)
-
-            @if ($cek = 0)
-                <div align="center" style="display:block">
-            <h3 align="center">Pilih Waktu Dinas :</h3>
-            <form>
-                <input type="radio" id="pagi" name="waktuDinas" value="Pagi" onclick="myFunction(this.value)">
-                <label for="pagi">PAGI</label>
-                <input type="radio" id="siang" name="waktuDinas" value="Siang" onclick="myFunction(this.value)">
-                <label for="siang">SIANG</label>
-                <input type="radio" id="malam" name="waktuDinas" value="Malam" onclick="myFunction(this.value)">
-                <label for="malam">MALAM</label><br>
-                <input type="text" id="dinas" hidden>
-            </form>
-        </div>
-        <button id="takeabsen" class="btn btn-primary btn-block">
-            <ion-icon name="camera-outline"></ion-icon>
-            Absen Masuk
-        </button>
-            @elseif (!empty($d -> jam_in) && empty($d -> jam_out))
-                <button id="takeabsen" class="btn btn-danger btn-block">
-                    <ion-icon name="camera-outline"></ion-icon>
-                    Absen Pulang
-                </button>
-            @elseif (!empty($d -> jam_in) && !empty($d -> jam_out))
-                <span>Anda Sudah Absen Hari Ini</span>
-            @endif
-        
-        @endforeach -->
            
     </div>
 </div>
@@ -200,11 +159,6 @@
         navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
     }
 
-    // fungsi untuk menyimpan waktu dinas
-    //function myFunction(waktuDinas) {
-    //    document.getElementById("dinas").value = waktuDinas;
-    //}
-
     // ketika berhasil mendapatkan current position dari user
     function successCallback(position){
         lokasi.value = position.coords.latitude + "," + position.coords.longitude;
@@ -234,20 +188,11 @@
     // ketika tombol ambil absen di tekan
     $("#takeabsen").click(function(e){
         var lokasi = $("#lokasi").val();
-        //var dinas = $("#dinas").val();
-        // if(dinas == ''){
-        //     //alert('Pilih Waktu Dinas')
-        //     Swal.fire({
-        //         title: "Info",
-        //         text: "Silahkan Pilih Waktu Dinas",
-        //         icon: "info"
-        //     });
-        //}else{
             Webcam.snap(function(uri){
                 image = uri;
             });
-            // var lokasi = $("#lokasi").val();
-            // var dinas = $("#dinas").val();
+            //var lokasi = $("#lokasi").val();
+            //var dinas = $("#dinas").val();
             $.ajax({
                 type:'POST',
                 url:'/presensi/store',

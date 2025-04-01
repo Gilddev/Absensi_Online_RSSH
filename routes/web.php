@@ -153,7 +153,7 @@ Route::middleware(['multi_auth'])->group(function () {
     Route::post('/karyawan/{nik}/resetpassword', [KaryawanController::class, 'resetpassword']);
 
     //konfigurasi jam kerja
-    Route::get('/konfigurasi/{nik}/setjamkerja', [KonfigurasiController::class, 'setjamkerja']);
+    Route::get('/konfigurasi/{nik}/setjamkerja', [KonfigurasiController::class, 'setjamkerja'])->name('edit.setjamkerjakaryawan');
     Route::post('/konfigurasi/storesetjamkerja', [KonfigurasiController::class, 'storesetjamkerja']);
     Route::post('/konfigurasi/updatesetjamkerja', [KonfigurasiController::class, 'updatesetjamkerja']);
 });

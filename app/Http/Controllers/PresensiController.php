@@ -35,15 +35,19 @@ class PresensiController extends Controller
         $cek_lintas_hari_presensi = $cek_presensi_sebelumnya != null ? $cek_presensi_sebelumnya->lintashari : 0;
 
         if ($cek_lintas_hari_presensi == 1){
-            if ($jamsekarang < "08:00"){
+            if ($jamsekarang < "09:00"){
                 $hariini = $tgl_sebelumnya;
             }
         }
 
-        $namatanggal = $this->gettanggal(date('d', strtotime($hariini)));
+        // $namatanggal = $this->gettanggal(date('d', strtotime($hariini)));
+
+        $namatanggal = date('Y-m-d', strtotime($hariini));
+
         $cek = DB::table('presensi')->where('tgl_presensi', $hariini)->where('nik', $nik)->count();
         $cekkondisi = DB::table('presensi')->select('nik', 'jam_in', 'jam_out')->where('tgl_presensi', $hariini)->where('nik', $nik)->get();
         $lok_kantor = DB::table('konfigurasi_lokasi')->where('id', 1)->first();
+        
         $jamkerja = DB::table('konfigurasi_jam_kerja')
             ->join('jam_kerja', 'konfigurasi_jam_kerja.kode_jam_kerja', '=', 'jam_kerja.kode_jam_kerja')
             ->where('nik', $nik)->where('tanggal_kerja', $namatanggal)->first();
@@ -59,6 +63,7 @@ class PresensiController extends Controller
         $nik = Auth::guard('karyawan')->user()->nik;
         $hariini = date("Y-m-d");
         $jamsekarang = date("H:i");
+
         $tgl_sebelumnya = date("Y-m-d", strtotime("-1 days", strtotime($hariini)));
         $cek_presensi_sebelumnya = DB::table('presensi')
             ->join('jam_kerja', 'presensi.kode_jam_kerja', '=', 'jam_kerja.kode_jam_kerja')
@@ -67,8 +72,8 @@ class PresensiController extends Controller
             ->first();
 
         $cek_lintas_hari_presensi = $cek_presensi_sebelumnya != null ? $cek_presensi_sebelumnya->lintashari : 0;
+        $tgl_presensi = $cek_lintas_hari_presensi == 1 && $jamsekarang < "09:00" ? $tgl_sebelumnya : date("Y-m-d");
 
-        $tgl_presensi = $cek_lintas_hari_presensi == 1 && $jamsekarang < "08:00" ? $tgl_sebelumnya : date("Y-m-d");
         $jam = date("H:i:s");
         $lok_kantor = DB::table('konfigurasi_lokasi')->where('id', 1)->first();
         $lok = explode(",", $lok_kantor->lokasi_kantor);
@@ -83,10 +88,16 @@ class PresensiController extends Controller
         $radius = round($jarak["meters"]);
 
         // cek jam kerja karyawan
-        $namatanggal = $this->gettanggal(date('d', strtotime($tgl_presensi)));
+        // $namatanggal = $this->gettanggal(date('Y-m-d', strtotime($tgl_presensi)));
+        // $jamkerja = DB::table('konfigurasi_jam_kerja')
+        //     ->join('jam_kerja', 'konfigurasi_jam_kerja.kode_jam_kerja', '=', 'jam_kerja.kode_jam_kerja')
+        //     ->where('nik', $nik)->where('tanggal_kerja', $namatanggal)->first();
+
         $jamkerja = DB::table('konfigurasi_jam_kerja')
             ->join('jam_kerja', 'konfigurasi_jam_kerja.kode_jam_kerja', '=', 'jam_kerja.kode_jam_kerja')
-            ->where('nik', $nik)->where('tanggal_kerja', $namatanggal)->first();
+            ->where('nik', $nik)
+            ->whereDate('tanggal_kerja', $tgl_presensi)  // Pastikan tanggal_kerja sesuai dengan tanggal presensi
+            ->first();
 
         $presensi = DB::table('presensi')->where('tgl_presensi', $tgl_presensi)->where('nik', $nik);
         $cek = $presensi->count();
@@ -107,6 +118,12 @@ class PresensiController extends Controller
         $file = $folderPath . $fileName;
         
         $tgl_pulang = $jamkerja->lintashari == 1 ? date('Y-m-d', strtotime("+1 days", strtotime($tgl_presensi))) : $tgl_presensi;
+        // if ($jamkerja) {
+        //     $tgl_pulang = $jamkerja->lintashari == 1 ? date('Y-m-d', strtotime("+1 days", strtotime($tgl_presensi))) : $tgl_presensi;
+        // } else {
+        //     return response()->json(['error' => 'Jam kerja tidak ditemukan. Hubungi admin.'], 400);
+        // }
+        
         $jam_pulang = $hariini . " " . $jam;
         $jam_kerja_pulang = $tgl_pulang . " " . $jamkerja->jam_pulang;
 
@@ -138,6 +155,14 @@ class PresensiController extends Controller
                 } else if ($jam > $jamkerja->akhir_jam_masuk) {
                     echo ("error|Maaf, Waktu Melakukan Absensi Sudah Habis|in");
                 } else {
+                    // dd([
+                    //     'NIK' => $nik,
+                    //     'Tanggal Presensi' => $tgl_presensi,
+                    //     'Nama Tanggal' => $namatanggal,
+                    //     'Jam Kerja' => $jamkerja,
+                    //     'Kode Jam Kerja' => $jamkerja ? $jamkerja->kode_jam_kerja : 'Tidak ditemukan',
+                    // ]);
+                    
                     $data = [
                         'nik' => $nik,
                         'tgl_presensi' => $tgl_presensi,
@@ -378,7 +403,7 @@ class PresensiController extends Controller
                 $join->on('karyawan.nik', '=', 'presensi.nik')
                     ->whereDate('presensi.tgl_presensi', $tanggalHariIni);
             })
-            ->where('konfigurasi_jam_kerja.tanggal_kerja', Carbon::now()->format('d')) // Tanggal kerja hari ini
+            ->where('konfigurasi_jam_kerja.tanggal_kerja', Carbon::now()->toDateString()) // Tanggal kerja hari ini
             ->whereNotNull('konfigurasi_jam_kerja.kode_jam_kerja')
             ->select('konfigurasi_jam_kerja.*', 'karyawan.nama_lengkap', 'karyawan.jabatan', 'ruangan.nama_ruangan', 'jam_kerja.nama_jam_kerja', 'presensi.jam_in')
             ->orderBy('ruangan.nama_ruangan')

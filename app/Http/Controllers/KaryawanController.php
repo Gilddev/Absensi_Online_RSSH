@@ -98,7 +98,7 @@ class KaryawanController extends Controller
         }
 
         // Menambahkan parameter pencarian ke pagination
-        $karyawan = $query->paginate(5)->appends([
+        $karyawan = $query->paginate(10)->appends([
             'nama_lengkap' => $request->nama_karyawan,
             'kode_ruangan' => $request->kode_ruangan
         ]);
