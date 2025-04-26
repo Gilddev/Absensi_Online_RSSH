@@ -7,7 +7,7 @@
                 <ion-icon name="chevron-back-outline"></ion-icon>
             </a>
         </div>
-        <div class="pageTitle">Absensi Reguler</div>
+        <div class="pageTitle">Absensi Luar Kantor</div>
         <div class="right"></div>
     </div>
     <!-- * App Header -->
@@ -87,21 +87,33 @@
         @endforeach
 
         @else
+        <div class="col">
+            <div class="form-group boxed">
+                <div class="input-wrapper">
+                    <input type="text" class="form-control mt-1" name="keterangan" id="keterangan" placeholder="Nama Kegiatan" autocomplete="off">
+                </div>
+            </div>
+            <div class="form-group boxed">
+                <div class="input-wrapper">
+                    <button id="takeabsen" class="btn btn-primary btn-block mt-1">
+                        <ion-icon name="camera-outline"></ion-icon>
+                        Absen Masuk
+                    </button>
+                </div>
+            </div>
 
-        <button id="takeabsen" class="btn btn-primary btn-block mt-1">
-            <ion-icon name="camera-outline"></ion-icon>
-            Absen Masuk
-        </button>
+        </div>
         @endif
            
     </div>
 </div>
 
-<div class="row mt-2">
+{{-- untuk menampilkan maps --}}
+{{-- <div class="row mt-2">
     <div class="col">
         <div id="map" style="height: 400px;"></div>
     </div>
-</div>
+</div> --}}
 
 <audio id="notifikasi_in">
     <source src="{{asset('assets/sound/notifikasi_in.mp3')}}" type="audio/mpeg">
@@ -187,6 +199,7 @@
 
     // ketika tombol ambil absen di tekan
     $("#takeabsen").click(function(e){
+        var keterangan = $("#keterangan").val();
         var lokasi = $("#lokasi").val();
             Webcam.snap(function(uri){
                 image = uri;
@@ -195,11 +208,12 @@
             //var dinas = $("#dinas").val();
             $.ajax({
                 type:'POST',
-                url:'/presensi/store',
+                url:'/presensi/storeluar',
                 data:{
                     _token:"{{csrf_token()}}",
                     image:image,
                     lokasi:lokasi,
+                    keterangan:keterangan
                     //dinas:dinas
                 },
                 cache:false,

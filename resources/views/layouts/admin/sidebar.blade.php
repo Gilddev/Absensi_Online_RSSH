@@ -235,6 +235,15 @@
                       <a class="dropdown-item" href="/presensi/rekap">
                         Rekap Presensi
                       </a>
+                      <a class="dropdown-item" href="/presensi/rekaponcall">
+                        Rekap Oncall
+                      </a>
+                      <a class="dropdown-item" href="/presensi/rekapkuliahsubuh">
+                        Rekap Kuliah Subuh
+                      </a>
+                      <a class="dropdown-item" href="#">
+                        Rekap Persentase
+                      </a>
                     </div>
                   </div>
                 </div>

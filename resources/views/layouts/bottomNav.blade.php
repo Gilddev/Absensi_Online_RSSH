@@ -22,6 +22,15 @@
                 <!-- </div> -->
             </div>
         </a>
+        <a href="/absensi_lainnya/" class="item ">
+            <div class="col">
+                <!-- <div class="action-button large"> -->
+                <ion-icon name="camera-outline" role="img" class="md hydrated" 
+                    aria-label="add outline"></ion-icon>
+                <strong>Lainnya</strong>
+                <!-- </div> -->
+            </div>
+        </a>
         <a href="/presensi/izin" class="item {{request()->is('presensi/izin') ? 'active' : ''}}">
             <div class="col">
             <ion-icon name="mail-outline"></ion-icon>

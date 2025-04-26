@@ -8,6 +8,8 @@ use App\Http\Controllers\RuanganController;
 use App\Http\Controllers\KonfigurasiController;
 use App\Http\Controllers\IzinabsenController;
 use App\Http\Controllers\IzinsakitController;
+use App\Http\Controllers\AbsensiLainnyaController;
+use App\Http\Controllers\PresensiKuliahSubuhController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\AbstractRouteCollection;
 
@@ -33,7 +35,7 @@ route::middleware(['guest:karu'])->group(function(){
 });
 
 route::middleware(['auth:karyawan'])->group(function(){
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/proseslogout', [AuthController::class, 'proseslogout']);
 
     //presensi
@@ -41,6 +43,19 @@ route::middleware(['auth:karyawan'])->group(function(){
     Route::post('/presensi/store', [PresensiController::class, 'store']);
     Route::delete('/presensi/hapus-datang/{id}', [PresensiController::class, 'hapusAbsensiDatang'])->name('presensi.hapusDatang');
     Route::delete('/presensi/hapus-pulang/{id}', [PresensiController::class, 'hapusAbsensiPulang'])->name('presensi.hapusPulang');
+
+    //presensi lainnya (luar kantor)
+    Route::get('/presensi/luar', [PresensiController::class, 'createLuar']);
+    Route::get('/presensi/create_luar', [PresensiController::class, 'createLuar']);
+    Route::post('/presensi/storeluar', [PresensiController::class, 'storeLuar']);
+
+    //presensi lainnya (oncall)
+    Route::get('/presensi/create_oncall', [PresensiController::class, 'createOncall']);
+    Route::post('/presensi/storeoncall', [PresensiController::class, 'storeOncall']);
+
+    //presensi lainnya (kuliah subuh)
+    Route::get('/presensi/create_kuliahsubuh', [PresensiKuliahSubuhController::class, 'createKuliahSubuh']);
+    Route::post('/presensi/storekuliahsubuh', [PresensiKuliahSubuhController::class, 'storeKuliahSubuh']);
 
     //edit profile
     Route::get('/editprofile', [PresensiController::class,'editprofile']);
@@ -74,6 +89,16 @@ route::middleware(['auth:karyawan'])->group(function(){
 
     //mendownload file gambar surat izin
     // Route::get('/download/{filename}', [FileController::class, 'downloadFile']);
+
+    // Halaman utama Absensi Lainnya
+    Route::get('/absensi_lainnya', [AbsensiLainnyaController::class, 'index'])->name('absensi.lainnya.index');
+
+    // Form Absen Kegiatan Luar
+    Route::get('/absensi_lainnya/kegiatan-luar', [AbsensiLainnyaController::class, 'kegiatanLuar'])->name('absensi.lainnya.kegiatan-luar');
+
+    // Submit Form Absen Kegiatan Luar
+    Route::post('/absensi_lainnya/kegiatan-luar', [AbsensiLainnyaController::class, 'storeKegiatanLuar'])->name('absensi.lainnya.kegiatan-luar.store');
+
 });
 
 Route::middleware(['auth:karu']) -> group(function(){
@@ -121,13 +146,30 @@ Route::middleware(['auth:user']) -> group(function(){
 
     Route::post('/getpresensi', [PresensiController::class, 'getpresensi']);
     Route::post('/tampilkanpeta', [PresensiController::class, 'tampilkanpeta']);
-    Route::get('/presensi/laporan', [PresensiController::class, 'laporan']);
-    Route::post('/presensi/cetaklaporan', [PresensiController::class, 'cetaklaporan']);
-    Route::get('/presensi/rekap', [PresensiController::class, 'rekap']);
-    Route::post('/presensi/cetakrekap', [PresensiController::class, 'cetakrekap']);
+    
     Route::get('/presensi/izinsakit', [PresensiController::class, 'izinsakit']);
     Route::post('/presensi/approveizinsakit', [PresensiController::class, 'approveizinsakit']);
     Route::get('/presensi/{kode_izin}/batalkanizinsakit', [PresensiController::class, 'batalkanizinsakit']);
+
+    //rekap per karyawan
+    Route::get('/presensi/laporan', [PresensiController::class, 'laporan']);
+    Route::post('/presensi/cetaklaporan', [PresensiController::class, 'cetaklaporan']);
+
+    //rekap per ruangan
+    Route::get('/presensi/rekap', [PresensiController::class, 'rekap']);
+    Route::post('/presensi/cetakrekap', [PresensiController::class, 'cetakrekap']);
+
+    //rekap oncall
+    Route::get('/presensi/rekaponcall', [PresensiController::class, 'rekapOncall']);
+    Route::post('/presensi/cetakrekaponcall', [PresensiController::class, 'cetakRekapOncall']);
+
+    //rekap kuliah subuh
+    Route::get('/dashboard/rekapkuliahsubuh', [PresensiKuliahSubuhController::class, 'rekapKuliahSubuh']);
+    Route::post('/dashboard/cetakrekapkuliahsubuh', [PresensiKuliahSubuhController::class, 'cetakrekapKuliahSubuh']);
+
+    //fungsi rekap persentase kehadiran
+    Route::get('/presensi/rekap-kehadiran', [PresensiController::class, 'tampilkanRekap'])->name('rekap.kehadiran');
+    Route::post('/presensi/rekap-kehadiran/sinkronisasi', [PresensiController::class, 'hitungPersentaseKehadiran'])->name('rekap.kehadiran.sinkronisasi');
 
     //konfigurasi
     Route::get('/konfigurasi/lokasikantor', [KonfigurasiController::class, 'lokasikantor']);

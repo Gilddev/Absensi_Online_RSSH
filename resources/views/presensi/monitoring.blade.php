@@ -46,6 +46,7 @@
                                             <th>Jam Pulang</th>
                                             <th>Foto</th>
                                             <th>Status</th>
+                                            <th>Jenis</th>
                                             <th>Keterangan</th>
                                             <th>Detail</th>
                                 </tr>

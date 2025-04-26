@@ -44,13 +44,20 @@ function selisih($jam_masuk, $jam_keluar)
             @endif
         </td>
         <td>
-            @if ($d->jam_in >= $d->jam_masuk)
-            @php
-            $jam_terlambat = selisih($d->jam_masuk, $d->jam_in);
-            @endphp
-            <span class="badge bg-danger" style="color:white">Terlambat {{ $jam_terlambat }}</span>
-            @else
-            <span class="badge bg-success" style="color:white">Tepat Waktu</span>
+            {{ $d->jenis_presensi }}
+        </td>
+        <td>
+            @if ($d->jenis_presensi == "Absensi Regular")
+                @if ($d->jam_in >= $d->jam_masuk)
+                @php
+                $jam_terlambat = selisih($d->jam_masuk, $d->jam_in);
+                @endphp
+                <span>Terlambat {{ $jam_terlambat }}</span>
+                @else
+                <span>Tepat Waktu</span>
+                @endif
+            @elseif ($d->jenis_presensi == "Absensi Luar")
+                {{ $d->keterangan_luar }}
             @endif
         </td>
         <td>
@@ -59,7 +66,7 @@ function selisih($jam_masuk, $jam_keluar)
             </a>
         </td>
     </tr>
-@else
+@elseif ($d->status == "s" || $d->status == "i")
     <tr>
         <td>{{ $loop -> iteration }}</td>
         <td>{{ $d -> nama_lengkap }}</td>
@@ -76,7 +83,29 @@ function selisih($jam_masuk, $jam_keluar)
                 <span class="badge bg-danger" style="color:white">Sakit</span>
             @endif
         </td>
-        <td>{{ $d->keterangan }}</td>
+        <td></td>
+        <td>{{ $d->keterangan_pengajuan }}</td>
+        <td></td>
+    </tr>
+@elseif ($d->status == "op" || $d->status == "ok")
+    <tr>
+        <td>{{ $loop -> iteration }}</td>
+        <td>{{ $d -> nama_lengkap }}</td>
+        <td>{{ $d -> nama_ruangan }}</td>
+        <td>{{ $d -> nama_jam_kerja }}</td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td>
+            @if ($d->status == "op")
+                <span class="badge bg-warning" style="color:white">OC Pribadi</span>
+                @elseif ($d->status == "s")
+                <span class="badge bg-danger" style="color:white">OC Kantor</span>
+            @endif
+        </td>
+        <td></td>
+        <td>{{ $d->keterangan_presensi }}</td>
         <td></td>
     </tr>
 @endif

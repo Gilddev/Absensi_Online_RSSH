@@ -24,5 +24,6 @@ class Presensi extends Model
         'kode_jam_kerja',
         'status',
         'kode_izin',
+        'jenis_presensi',
     ];
 }
