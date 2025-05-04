@@ -9,6 +9,7 @@ use App\Http\Controllers\KonfigurasiController;
 use App\Http\Controllers\IzinabsenController;
 use App\Http\Controllers\IzinsakitController;
 use App\Http\Controllers\AbsensiLainnyaController;
+use App\Http\Controllers\Api\RekapKehadiranController as ApiRekapKehadiranController;
 use App\Http\Controllers\PresensiKuliahSubuhController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\AbstractRouteCollection;
@@ -166,8 +167,8 @@ Route::middleware(['auth:user']) -> group(function(){
     Route::post('/presensi/cetakrekaponcall', [PresensiController::class, 'cetakRekapOncall']);
 
     //rekap kuliah subuh
-    Route::get('/dashboard/rekapkuliahsubuh', [PresensiKuliahSubuhController::class, 'rekapKuliahSubuh']);
-    Route::post('/dashboard/cetakrekapkuliahsubuh', [PresensiKuliahSubuhController::class, 'cetakrekapKuliahSubuh']);
+    Route::get('/presensi/rekapkuliahsubuh', [PresensiKuliahSubuhController::class, 'rekapKuliahSubuh']);
+    Route::post('/presensi/cetakrekapkuliahsubuh', [PresensiKuliahSubuhController::class, 'cetakrekapKuliahSubuh']);
 
     //fungsi rekap persentase kehadiran
     Route::get('/presensi/rekap-kehadiran', [PresensiController::class, 'tampilkanRekap'])->name('rekap.kehadiran');
