@@ -241,7 +241,7 @@
                       <a class="dropdown-item" href="/presensi/rekapkuliahsubuh">
                         Rekap Kuliah Subuh
                       </a>
-                      <a class="dropdown-item" href="#">
+                      <a class="dropdown-item" href="/presensi/cetakrekapkehadiran">
                         Rekap Persentase
                       </a>
                     </div>

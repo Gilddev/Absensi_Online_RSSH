@@ -52,9 +52,29 @@
         <div class="section" id="menu-section">
             <div class="card">
                 <div class="card-body text-center">
+                    <h3>Persentase Presensi</h3>
                     <div class="list-menu">
 
-                        <div class="item-menu text-center">
+                        <div class="row">
+                            <div class="item-menu text-center mx-3">
+                                <p>Kehadiran</p>
+                                @if ($rekap)
+                                    <h3>{{ $rekap->persentase_kehadiran }}%</h3>
+                                @else
+                                    <h3>0.00%</h3>
+                                @endif
+                            </div>
+                            <div class="item-menu text-center mx-3">
+                                <p>Keterlambatan</p>
+                                @if ($rekap)
+                                    <h3>{{ $rekap->persentase_keterlambatan }}%</h3>
+                                @else
+                                    <h3>0.00%</h3>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- <div class="item-menu text-center">
                             <div class="menu-icon">
                                 <a href="/editprofile" class="green" style="font-size: 40px;">
                                     <ion-icon name="person-sharp"></ion-icon>
@@ -86,13 +106,13 @@
                             <div class="menu-name">
                                 Lokasi
                             </div>
-                        </div>
+                        </div> --}}
 
                     </div>
                 </div>
             </div>
         </div>
-        <div class="section mt-2" id="presence-section">
+        <div class="section mt-5" id="presence-section">
             <div class="todaypresence">
                 <div class="row">
                     
@@ -518,3 +538,28 @@
             </div>
         </div>
 @endsection
+
+{{-- @push('myscript')
+<script>
+    let isNavigatingBack = false;
+
+    // Deteksi tombol back
+    window.addEventListener('popstate', function (event) {
+        if (!isNavigatingBack) {
+            event.preventDefault();
+
+            if (confirm("Apakah Anda ingin logout?")) {
+                window.location.href = "{{ route('logout.karyawan') }}"; // sesuaikan dengan rute logout kamu
+            } else {
+                // Push kembali ke halaman saat ini agar tidak benar-benar mundur
+                history.pushState(null, null, location.href);
+            }
+        }
+    });
+
+    // Mencegah back button langsung keluar dari halaman
+    window.onload = function () {
+        history.pushState(null, null, location.href);
+    };
+</script>
+@endpush --}}

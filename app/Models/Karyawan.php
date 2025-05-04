@@ -33,4 +33,13 @@ class Karyawan extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function ruangan()
+    {
+        return $this->belongsTo(Ruangan::class, 'kode_ruangan', 'kode_ruangan');
+    }
+
+    public function rekapPresensi(){
+        return $this->hasMany(RekapPresensi::class, 'nik', 'nik');
+    }
 }

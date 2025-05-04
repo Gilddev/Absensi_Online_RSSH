@@ -15,7 +15,7 @@ use Carbon\Carbon;
 
 use App\Models\Pengajuanizin;
 use App\Models\Setjamkerja;
-use App\Models\RekapKehadiran;
+use App\Models\RekapPresensi;
 
 class PresensiController extends Controller
 {
@@ -843,7 +843,7 @@ class PresensiController extends Controller
 
         $query->orderBy('karyawan.kode_ruangan');
         $rekap = $query->get();
-        dd($rekap);
+        // dd($rekap);
 
         return view('presensi.cetakrekaponcall', compact('bulan', 'rekap', 'tahun', 'namabulan', 'rangetanggal', 'jmlhari'));
     }
@@ -964,66 +964,66 @@ class PresensiController extends Controller
         }
     }
 
-    public function tampilkanRekap()
-    {
-        $rekap = RekapKehadiran::with('karyawan')->orderBy('bulan', 'desc')->orderBy('tahun', 'desc')->get();
+    // public function tampilkanRekap()
+    // {
+    //     $rekap = RekapKehadiran::with('karyawan')->orderBy('bulan', 'desc')->orderBy('tahun', 'desc')->get();
 
-        return view('rekap_kehadiran', compact('rekap'));
-    }
+    //     return view('rekap_kehadiran', compact('rekap'));
+    // }
 
-    public function hitungPersentaseKehadiran(Request $request)
-    {
-        $bulan = $request->bulan ?? date('m');
-        $tahun = $request->tahun ?? date('Y');
+    // public function hitungPersentaseKehadiran(Request $request)
+    // {
+    //     $bulan = $request->bulan ?? date('m');
+    //     $tahun = $request->tahun ?? date('Y');
 
-        $karyawans = Karyawan::all();
+    //     $karyawans = Karyawan::all();
 
-        foreach ($karyawans as $karyawan) {
-            $nik = $karyawan->nik;
+    //     foreach ($karyawans as $karyawan) {
+    //         $nik = $karyawan->nik;
 
-            // Hitung total hari kerja
-            $jumlahHariKerja = DB::table('jam_kerja')
-                ->where('nik', $nik)
-                ->whereMonth('tanggal_kerja', $bulan)
-                ->whereYear('tanggal_kerja', $tahun)
-                ->count();
+    //         // Hitung total hari kerja
+    //         $jumlahHariKerja = DB::table('jam_kerja')
+    //             ->where('nik', $nik)
+    //             ->whereMonth('tanggal_kerja', $bulan)
+    //             ->whereYear('tanggal_kerja', $tahun)
+    //             ->count();
 
-            if ($jumlahHariKerja == 0) continue;
+    //         if ($jumlahHariKerja == 0) continue;
 
-            // Hitung jumlah hadir
-            $jumlahHadir = DB::table('presensi')
-                ->where('nik', $nik)
-                ->whereMonth('tanggal_presensi', $bulan)
-                ->whereYear('tanggal_presensi', $tahun)
-                ->count();
+    //         // Hitung jumlah hadir
+    //         $jumlahHadir = DB::table('presensi')
+    //             ->where('nik', $nik)
+    //             ->whereMonth('tanggal_presensi', $bulan)
+    //             ->whereYear('tanggal_presensi', $tahun)
+    //             ->count();
 
-            // Hitung keterlambatan (contoh jika lewat jam 08:00 dianggap telat)
-            $jumlahTelat = DB::table('presensi')
-                ->where('nik', $nik)
-                ->whereMonth('tanggal_presensi', $bulan)
-                ->whereYear('tanggal_presensi', $tahun)
-                ->whereTime('jam_in', '>', '08:00:00')
-                ->count();
+    //         // Hitung keterlambatan (contoh jika lewat jam 08:00 dianggap telat)
+    //         $jumlahTelat = DB::table('presensi')
+    //             ->where('nik', $nik)
+    //             ->whereMonth('tanggal_presensi', $bulan)
+    //             ->whereYear('tanggal_presensi', $tahun)
+    //             ->whereTime('jam_in', '>', '08:00:00')
+    //             ->count();
 
-            $persenHadir = round(($jumlahHadir / $jumlahHariKerja) * 100, 2);
-            $persenTelat = round(($jumlahTelat / $jumlahHariKerja) * 100, 2);
+    //         $persenHadir = round(($jumlahHadir / $jumlahHariKerja) * 100, 2);
+    //         $persenTelat = round(($jumlahTelat / $jumlahHariKerja) * 100, 2);
 
-            // Simpan atau update ke rekap_presensi
-            RekapKehadiran::updateOrCreate(
-                [
-                    'nik' => $nik,
-                    'bulan' => $bulan,
-                    'tahun' => $tahun
-                ],
-                [
-                    'persentase_kehadiran' => $persenHadir,
-                    'persentase_keterlambatan' => $persenTelat,
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]
-            );
-        }
+    //         // Simpan atau update ke rekap_presensi
+    //         RekapKehadiran::updateOrCreate(
+    //             [
+    //                 'nik' => $nik,
+    //                 'bulan' => $bulan,
+    //                 'tahun' => $tahun
+    //             ],
+    //             [
+    //                 'persentase_kehadiran' => $persenHadir,
+    //                 'persentase_keterlambatan' => $persenTelat,
+    //                 'created_at' => now(),
+    //                 'updated_at' => now(),
+    //             ]
+    //         );
+    //     }
 
-        return redirect()->route('rekap.kehadiran')->with('success', 'Data rekap berhasil disinkronkan.');
-    }   
+    //     return redirect()->route('rekap.kehadiran')->with('success', 'Data rekap berhasil disinkronkan.');
+    // }   
 }

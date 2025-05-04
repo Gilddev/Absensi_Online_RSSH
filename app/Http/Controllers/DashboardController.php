@@ -5,11 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\RekapPresensi;
+use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        $karyawan = auth('karyawan')->user();
+        $bulan = Carbon::now()->month;
+        $tahun = Carbon::now()->year;
+
+        $rekap = RekapPresensi::where('nik', $karyawan->nik)
+            ->where('bulan', $bulan)
+            ->where('tahun', $tahun)
+            ->first();
+
         $hariini = date('Y-m-d');
         $bulanini = date('m') * 1;
         $tahunini = date('Y');
@@ -63,7 +74,7 @@ class DashboardController extends Controller
         //     -> first();
 
         return view('dashboard.dashboard', compact('presensihariini', 'historibulanini', 'namabulan', 'bulanini', 
-        'tahunini', 'rekappresensi', 'leaderboard'));
+        'tahunini', 'rekappresensi', 'leaderboard', 'rekap'));
     }
 
     public function dashboardadmin(){

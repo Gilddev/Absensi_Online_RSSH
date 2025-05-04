@@ -13,6 +13,8 @@ use App\Http\Controllers\PresensiKuliahSubuhController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\AbstractRouteCollection;
 
+use App\Http\Controllers\RekapKehadiranController;
+
 route::middleware(['guest:karyawan'])->group(function(){
     route::get('/', function(){
         return view('auth.login');
@@ -36,7 +38,7 @@ route::middleware(['guest:karu'])->group(function(){
 
 route::middleware(['auth:karyawan'])->group(function(){
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/proseslogout', [AuthController::class, 'proseslogout']);
+    Route::get('/proseslogout', [AuthController::class, 'proseslogout'])->name('logout.karyawan');
 
     //presensi
     Route::get('/presensi/create', [PresensiController::class, 'create']);
@@ -184,6 +186,10 @@ Route::middleware(['auth:user']) -> group(function(){
     // Route::get('/konfigurasi/{nik}/setjamkerja', [KonfigurasiController::class, 'setjamkerja']);
     // Route::post('/konfigurasi/storesetjamkerja', [KonfigurasiController::class, 'storesetjamkerja']);
     // Route::post('/konfigurasi/updatesetjamkerja', [KonfigurasiController::class, 'updatesetjamkerja']);
+
+    //tampilan cetak rekap dan tombol sync ulang
+    Route::get('presensi/cetakrekapkehadiran', [RekapKehadiranController::class, 'cetakRekapKehadiran'])->name('cetak.rekap.kehadiran');
+    Route::get('presensi/tombolrekapkehadiran', [RekapKehadiranController::class, 'sync'])->name('rekap-kehadiran.sync');
 });
 
 Route::middleware(['multi_auth'])->group(function () {
