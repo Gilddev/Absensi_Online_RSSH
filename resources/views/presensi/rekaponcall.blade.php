@@ -6,7 +6,7 @@
             <div class="col">
                 <!-- Page pre-title -->
                 <h2 class="page-title">
-                  Rekap Presensi
+                  Rekap Oncall
                 </h2>
             </div>
         </div>
@@ -19,7 +19,7 @@
             <div class="col-6">
                 <div class="card">
                     <div class="card-body">
-                        <form action="/presensi/cetakrekap" target="_blank" method="POST">
+                        <form action="/presensi/cetakrekaponcall" target="_blank" method="POST">
                             @csrf
 
                             <div class="row mt-2">
@@ -51,6 +51,7 @@
                                     </div>
                                 </div>
                             </div>
+
                             <div class="row mt-2">
                                 <div class="col-12">
                                     <div class="form-group">
@@ -63,6 +64,7 @@
                                     </div>
                                 </div>
                             </div>
+                            
                             <div class="row mt-2">
                                 <div class="col-12">
                                     <div class="form-group" name="cetak">
@@ -87,5 +89,4 @@
         </div>
     </div>
 </div>
-
 @endsection

@@ -24,5 +24,14 @@ class Presensi extends Model
         'kode_jam_kerja',
         'status',
         'kode_izin',
+        'jenis_presensi',
     ];
+
+    public function jamKerja(){
+        return $this->belongsTo(Setjamkerja::class, 'kode_jam_kerja', 'kode_jam_kerja');
+    }
+
+    public function karyawan(){
+        return $this->belongsTo(Karyawan::class, 'nik', 'nik');
+    }
 }

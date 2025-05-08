@@ -58,15 +58,16 @@
                         $jadwal_jam_masuk = $d->tgl_presensi . " " . $jam_masuk;
                         $jam_presesi = $d->tgl_presensi . " " . $jam_in;
                     @endphp
-
+                        {{-- 
                         @if ($jam_in > $jam_masuk )
                         <ion-icon name="finger-print-outline" style="font-size: 48px;" class="text-danger"></ion-icon>
                         @else
                         <ion-icon name="finger-print-outline" style="font-size: 48px;" class="text-success"></ion-icon>
-                        @endif
+                        @endif --}}
                     </div>
                     <div class="datapresensi">
                         <h3>{{ $d->nama_jam_kerja }}</h3>
+                        <p>{{ $d->jenis_presensi }}</p>
                         <p>{{ date("d-m-Y", strtotime($d->tgl_presensi)) }}</p>
                         <p>
                             {!! $d->jam_in != null ? date("H:i", strtotime($d->jam_in)) : '<span class="text-danger">Belum Absen Masuk</span>' !!} - 
@@ -82,6 +83,7 @@
                                 <p style="color:green">Tepat Waktu</p>
                             @endif
                         </div>
+                        <p>{{ $d->keterangan_luar }}</p>
                     </div>
                 </div>
             </div>

@@ -52,9 +52,29 @@
         <div class="section" id="menu-section">
             <div class="card">
                 <div class="card-body text-center">
+                    <h3>Persentase Presensi</h3>
                     <div class="list-menu">
 
-                        <div class="item-menu text-center">
+                        <div class="row">
+                            <div class="item-menu text-center mx-3">
+                                <p>Kehadiran</p>
+                                @if ($rekap)
+                                    <h3>{{ $rekap->persentase_kehadiran }}%</h3>
+                                @else
+                                    <h3>0.00%</h3>
+                                @endif
+                            </div>
+                            <div class="item-menu text-center mx-3">
+                                <p>Keterlambatan</p>
+                                @if ($rekap)
+                                    <h3>{{ $rekap->persentase_keterlambatan }}%</h3>
+                                @else
+                                    <h3>0.00%</h3>
+                                @endif
+                            </div>
+                        </div>
+
+                        {{-- <div class="item-menu text-center">
                             <div class="menu-icon">
                                 <a href="/editprofile" class="green" style="font-size: 40px;">
                                     <ion-icon name="person-sharp"></ion-icon>
@@ -86,13 +106,13 @@
                             <div class="menu-name">
                                 Lokasi
                             </div>
-                        </div>
+                        </div> --}}
 
                     </div>
                 </div>
             </div>
         </div>
-        <div class="section mt-2" id="presence-section">
+        <div class="section mt-5" id="presence-section">
             <div class="todaypresence">
                 <div class="row">
                     
@@ -250,7 +270,7 @@
             <div id="rekappresensi">
                 <h3>Rekap Presensi Bulan {{$namabulan[(int)$bulanini]}} {{$tahunini}}</h3>
                 <div class="row">
-                    <div class="col-3">
+                    <div class="col-4">
                         <div class="card">
                             <div class="card-body text-center" style="padding: 12px 12px !important">
                                 @if ($rekappresensi->jmlhadir > 0)
@@ -264,7 +284,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                         <div class="card">
                             <div class="card-body text-center" style="padding: 12px 12px !important">
                                 @if ($rekappresensi->jmlizin > 0)
@@ -278,7 +298,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4">
                         <div class="card">
                             <div class="card-body text-center" style="padding: 12px 12px !important">
                                 @if ($rekappresensi->jmlsakit > 0)
@@ -292,7 +312,35 @@
                             </div>
                         </div>
                     </div>
-                    <div class="col-3">
+                    <div class="col-4 mt-1">
+                        <div class="card">
+                            <div class="card-body text-center" style="padding: 12px 12px !important">
+                                @if ($rekappresensi->jmloncallpribadi > 0)
+                                <span class="badge bg-danger" style="position: absolute; top: 3px; right: 8px; font-size: 0.6rem; z-index:999">
+                                    {{$rekappresensi->jmloncallpribadi}}
+                                </span>
+                                @endif
+                                <ion-icon name="call-outline" style="font-size: 1.6rem" class="text-warning mb-1"></ion-icon>
+                                <br>
+                                <span style="font-size: 0.8rem font-weight: 500">OC Pribadi</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 mt-1">
+                        <div class="card">
+                            <div class="card-body text-center" style="padding: 12px 12px !important">
+                                @if ($rekappresensi->jmloncallkantor > 0)
+                                <span class="badge bg-danger" style="position: absolute; top: 3px; right: 8px; font-size: 0.6rem; z-index:999">
+                                    {{$rekappresensi->jmloncallkantor}}
+                                </span>
+                                @endif
+                                <ion-icon name="call-outline" style="font-size: 1.6rem" class="text-warning mb-1"></ion-icon>
+                                <br>
+                                <span style="font-size: 0.8rem font-weight: 500">OC Kantor</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4 mt-1">
                         <div class="card">
                             <div class="card-body text-center" style="padding: 12px 12px !important">
                                 @if ($rekappresensi->jmlterlambat > 0)
@@ -317,11 +365,6 @@
                                 Bulan Ini
                             </a>
                         </li>
-                        <!-- <li class="nav-item">
-                            <a class="nav-link" data-toggle="tab" href="#profile" role="tab">
-                                Leaderboard
-                            </a>
-                        </li> -->
                     </ul>
                 </div>
                 <div class="tab-content mt-2" style="margin-bottom:100px;">
@@ -385,6 +428,7 @@
                                         </div>
                                         <div class="datapresensi">
                                             <h3>{{ $d->nama_jam_kerja }}</h3>
+                                            <p>{{ $d->jenis_presensi }}</p>
                                             <p>{{ date("d-m-Y", strtotime($d->tgl_presensi)) }}</p>
                                             <p>
                                                 {!! $d->jam_in != null ? date("H:i", strtotime($d->jam_in)) : '<span class="text-danger">Belum Absen Masuk</span>' !!} - 
@@ -414,7 +458,7 @@
                                         <div class="datapresensi">
                                             <h3>IZIN</h3>
                                             <p>{{ date("d-m-Y", strtotime($d->tgl_presensi)) }} ({{$d->kode_izin}})</p>
-                                            <p>{{ $d->keterangan }}</p>
+                                            <p>{{ $d->keterangan_pengajuan }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -429,7 +473,37 @@
                                         <div class="datapresensi">
                                             <h3>SAKIT</h3>
                                             <p>{{ date("d-m-Y", strtotime($d->tgl_presensi)) }} ({{$d->kode_izin}})</p>
-                                            <p>{{ $d->keterangan }}</p>
+                                            <p>{{ $d->keterangan_pengajuan }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @elseif ($d->status == "op")
+                            <div class="card" style="margin-bottom: 5px; border: 1px solid green">
+                                <div class="card-body">
+                                    <div class="historicontent">
+                                        <div class="iconpresensi">
+                                            <ion-icon name="call-outline" style="font-size: 48px;" class="text-success"></ion-icon>
+                                        </div>
+                                        <div class="datapresensi">
+                                            <h3>Oncall Pribadi</h3>
+                                            <p>{{ date("d-m-Y", strtotime($d->tgl_presensi)) }} ({{$d->karyawan_pengganti}})</p>
+                                            <p>{{ $d->keterangan_presensi }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>        
+                        @elseif ($d->status == "ok")
+                            <div class="card" style="margin-bottom: 5px; border: 1px solid green">
+                                <div class="card-body">
+                                    <div class="historicontent">
+                                        <div class="iconpresensi">
+                                            <ion-icon name="call-outline" style="font-size: 48px;" class="text-success"></ion-icon>
+                                        </div>
+                                        <div class="datapresensi">
+                                            <h3>Oncall Kantor</h3>
+                                            <p>{{ date("d-m-Y", strtotime($d->tgl_presensi)) }} ({{$d->kode_oncall}})</p>
+                                            <p>{{ $d->keterangan_presensi }}</p>
                                         </div>
                                     </div>
                                 </div>
@@ -464,3 +538,28 @@
             </div>
         </div>
 @endsection
+
+{{-- @push('myscript')
+<script>
+    let isNavigatingBack = false;
+
+    // Deteksi tombol back
+    window.addEventListener('popstate', function (event) {
+        if (!isNavigatingBack) {
+            event.preventDefault();
+
+            if (confirm("Apakah Anda ingin logout?")) {
+                window.location.href = "{{ route('logout.karyawan') }}"; // sesuaikan dengan rute logout kamu
+            } else {
+                // Push kembali ke halaman saat ini agar tidak benar-benar mundur
+                history.pushState(null, null, location.href);
+            }
+        }
+    });
+
+    // Mencegah back button langsung keluar dari halaman
+    window.onload = function () {
+        history.pushState(null, null, location.href);
+    };
+</script>
+@endpush --}}

@@ -6,7 +6,7 @@
             <div class="col">
                 <!-- Page pre-title -->
                 <h2 class="page-title">
-                  Rekap Presensi
+                  Rekap Kuliah Subuh
                 </h2>
             </div>
         </div>
@@ -19,7 +19,7 @@
             <div class="col-6">
                 <div class="card">
                     <div class="card-body">
-                        <form action="/presensi/cetakrekap" target="_blank" method="POST">
+                        <form action="/presensi/cetakrekapkuliahsubuh" target="_blank" method="POST">
                             @csrf
 
                             <div class="row mt-2">

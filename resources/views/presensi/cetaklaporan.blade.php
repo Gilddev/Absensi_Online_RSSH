@@ -127,8 +127,9 @@
                 <th>Jam Pulang</th>
                 <th>Foto</th>
                 <th>Status</th>
+                <th>Jenis</th>
                 <th>Keterangan</th>
-                <th>Jam Kerja</th>
+                {{-- <th>Jam Kerja</th> --}}
             </tr>
                 @foreach ($presensi as $d)
                 @if ($d->status == "h")
@@ -151,15 +152,15 @@
                                 <img src="{{ asset('assets/img/sample/avatar/avatar1.jpg') }}" class="foto" alt="">
                             @endif
                         </td>
-                        <td style="text-align: center">{{ $d->status }}</td>
-                        <td>
+                        <td style="text-align: center">
+                            {{ $d->status }}
                             @if ($d -> jam_in > $d->jam_masuk)
                                 Terlambat {{ $jam_terlambat }}
                             @else
                                 Tepat Waktu
                             @endif
                         </td>
-                        <td>
+                        {{-- <td>
                             @if ($d -> jam_out != null)
                                 @php
                                     $tgl_masuk = $d->tgl_presensi;
@@ -175,6 +176,12 @@
                                 @endphp
                             @endif
                             {{ $jmljamkerja }}
+                        </td> --}}
+                        <td>
+                            {{ $d->jenis_presensi }}
+                        </td>
+                        <td>
+                            {{ $d->keterangan_luar }}
                         </td>
                     </tr>
                 @else

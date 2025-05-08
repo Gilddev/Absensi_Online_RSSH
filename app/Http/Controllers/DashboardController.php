@@ -5,11 +5,22 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\RekapPresensi;
+use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
     public function index()
     {
+        $karyawan = auth('karyawan')->user();
+        $bulan = Carbon::now()->month;
+        $tahun = Carbon::now()->year;
+
+        $rekap = RekapPresensi::where('nik', $karyawan->nik)
+            ->where('bulan', $bulan)
+            ->where('tahun', $tahun)
+            ->first();
+
         $hariini = date('Y-m-d');
         $bulanini = date('m') * 1;
         $tahunini = date('Y');
@@ -18,9 +29,10 @@ class DashboardController extends Controller
 
         // menampilkan histori pada dashboard
         $historibulanini = DB::table('presensi') -> whereRaw('MONTH(tgl_presensi)="' . $bulanini . '"')
-            -> select('presensi.*', 'keterangan', 'jam_kerja.*', 'file_surat_izin')
+            -> select('presensi.*', 'pengajuan_izin.keterangan as keterangan_pengajuan', 'presensi_oncall.keterangan as keterangan_presensi', 'jam_kerja.*', 'file_surat_izin', 'karyawan_pengganti')
             -> leftJoin('jam_kerja', 'presensi.kode_jam_kerja', '=', 'jam_kerja.kode_jam_kerja')
             -> leftJoin('pengajuan_izin', 'presensi.kode_izin', '=', 'pengajuan_izin.kode_izin')
+            -> leftJoin('presensi_oncall', 'presensi.kode_oncall', '=', 'presensi_oncall.kode_oncall')
             -> where('presensi.nik', $nik)
             -> whereRaw('MONTH(tgl_presensi)="' . $bulanini . '"')
             -> whereRaw('YEAR(tgl_presensi)="' . $tahunini . '"') 
@@ -33,6 +45,8 @@ class DashboardController extends Controller
             SUM(IF(status="h",1,0)) as jmlhadir,
             SUM(IF(status="i",1,0)) as jmlizin,
             SUM(IF(status="s",1,0)) as jmlsakit,
+            SUM(IF(status="op",1,0)) as jmloncallpribadi,
+            SUM(IF(status="ok",1,0)) as jmloncallkantor,
             SUM(IF(jam_in > jam_masuk, 1, 0)) as jmlterlambat
             ') 
             -> leftJoin('jam_kerja', 'presensi.kode_jam_kerja', '=', 'jam_kerja.kode_jam_kerja')
@@ -60,7 +74,7 @@ class DashboardController extends Controller
         //     -> first();
 
         return view('dashboard.dashboard', compact('presensihariini', 'historibulanini', 'namabulan', 'bulanini', 
-        'tahunini', 'rekappresensi', 'leaderboard'));
+        'tahunini', 'rekappresensi', 'leaderboard', 'rekap'));
     }
 
     public function dashboardadmin(){
