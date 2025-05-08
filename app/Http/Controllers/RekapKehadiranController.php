@@ -16,7 +16,7 @@ class RekapKehadiranController extends Controller
         return redirect()->back()->with('success', 'Data kehadiran berhasil disinkronisasi.');
     }
 
-    public function cetakRekapKehadiran(Request $request){
+    public function monitoringPersentase(Request $request){
         $namabulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", 
         "Oktober", "November", "Desember"];
         
@@ -30,9 +30,10 @@ class RekapKehadiranController extends Controller
         // Query dasar join ke tabel karyawan
         $query = DB::table('rekap_presensi')
                     ->join('karyawan', 'rekap_presensi.nik', '=', 'karyawan.nik')
-                    ->select('rekap_presensi.*', 'karyawan.nama_lengkap')
+                    ->select('rekap_presensi.*', 'karyawan.nama_lengkap', 'karyawan.kode_ruangan')
                     ->where('rekap_presensi.bulan', $bulanini)
-                    ->where('rekap_presensi.tahun', $tahunini);
+                    ->where('rekap_presensi.tahun', $tahunini)
+                    ->orderBy('karyawan.kode_ruangan');
 
         // Jika user memilih bulan dan tahun, lakukan filter
         if (!empty($bulan)) {
@@ -58,6 +59,53 @@ class RekapKehadiranController extends Controller
         $listTahun = range($tahunmulai, $tahunsekarang);
 
         // Kirim ke view
-        return view('presensi.rekapkehadiran', compact('rekapPresensi', 'listBulan', 'listTahun', 'bulan', 'tahun', 'namabulan'));
+        return view('presensi.monitoringpersentase', compact('rekapPresensi', 'listBulan', 'listTahun', 'bulan', 'tahun', 'namabulan'));
+    }
+
+    public function rekapPersentase(){
+        $namabulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", 
+        "Oktober", "November", "Desember"];
+        $ruangan = DB::table('ruangan')->get();
+        return view('presensi.rekappersentase', compact('namabulan', 'ruangan'));
+    }
+
+    public function cetakRekapPersentase(Request $request){
+        $namabulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", 
+        "Oktober", "November", "Desember"];
+        
+        // Ambil data bulan, tahun dan ruangan dari request
+        $bulan = $request->input('bulan');
+        $tahun = $request->input('tahun');
+        $kode_ruangan = $request->kode_ruangan;
+
+        $bulanini = request()->input('bulan') ?? Carbon::now()->month;
+        $tahunini = request()->input('tahun') ??Carbon::now()->year;
+
+        // Query dasar join ke tabel karyawan
+        $query = DB::table('rekap_presensi')
+                    ->join('karyawan', 'rekap_presensi.nik', '=', 'karyawan.nik')
+                    ->select('rekap_presensi.*', 'karyawan.nama_lengkap', 'karyawan.kode_ruangan')
+                    ->where('rekap_presensi.bulan', $bulanini)
+                    ->where('rekap_presensi.tahun', $tahunini)
+                    ->orderBy('karyawan.kode_ruangan');
+
+        // Jika user memilih bulan dan tahun, lakukan filter
+        if (!empty($bulan)) {
+            $query->where('rekap_presensi.bulan', $bulan);
+        }
+
+        if (!empty($tahun)) {
+            $query->where('rekap_presensi.tahun', $tahun);
+        }
+
+        if (!empty($kode_ruangan)) {
+            $query->where('karyawan.kode_ruangan', $kode_ruangan);
+        }
+
+        // Eksekusi query
+        $rekappersentase = $query->get();
+
+        // Kirim ke view
+        return view('presensi.cetakrekappersentase', compact('rekappersentase','bulan', 'tahun', 'namabulan'));
     }
 }

@@ -779,14 +779,14 @@ class PresensiController extends Controller
     public function rekapOncall(){
         $namabulan = ["", "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", 
         "Oktober", "November", "Desember"];
-        // $ruangan = DB::table('ruangan')->get();
-        // return view('presensi.rekap', compact('namabulan', 'ruangan'));
-        return view('presensi.rekaponcall', compact('namabulan'));
+        $ruangan = DB::table('ruangan')->get();
+        return view('presensi.rekaponcall', compact('namabulan', 'ruangan'));
     }
     
     public function cetakRekapOncall(Request $request){
         $bulan = $request->bulan;
         $tahun = $request->tahun;
+        $kode_ruangan = $request->kode_ruangan;
 
         $dari =  $tahun . "-" . $bulan . "-01";
         $sampai = date("Y-m-t", strtotime($dari));
@@ -841,11 +841,15 @@ class PresensiController extends Controller
             }
         );
 
+        if (!empty($kode_ruangan)){
+            $query->where('karyawan.kode_ruangan', $kode_ruangan);
+        }
+
         $query->orderBy('karyawan.kode_ruangan');
         $rekap = $query->get();
         // dd($rekap);
 
-        return view('presensi.cetakrekaponcall', compact('bulan', 'rekap', 'tahun', 'namabulan', 'rangetanggal', 'jmlhari'));
+        return view('presensi.cetakrekaponcall', compact('bulan', 'rekap', 'tahun', 'kode_ruangan', 'namabulan', 'rangetanggal', 'jmlhari'));
     }
 
     public function izinsakit(Request $request){
@@ -962,68 +966,41 @@ class PresensiController extends Controller
         } catch (\Exception $e) {
             return redirect('/presensi/izin')->with(['success' => 'Data Gagal Di Hapus']);
         }
+    } 
+
+    public function indexEditDataPresensi($id){
+        $presensi = Presensi::findOrFail($id);
+        return view('presensi.editdatapresensi', compact('presensi'));
     }
 
-    // public function tampilkanRekap()
-    // {
-    //     $rekap = RekapKehadiran::with('karyawan')->orderBy('bulan', 'desc')->orderBy('tahun', 'desc')->get();
+    public function updateEditDataPresensi(Request $request, $id){
+        $presensi = Presensi::findOrFail($id);
 
-    //     return view('rekap_kehadiran', compact('rekap'));
-    // }
+        $request->validate([
+            'jam_in' => 'required',
+            'jam_out' => 'nullable',
+        ]);
 
-    // public function hitungPersentaseKehadiran(Request $request)
-    // {
-    //     $bulan = $request->bulan ?? date('m');
-    //     $tahun = $request->tahun ?? date('Y');
+        $data = [];
 
-    //     $karyawans = Karyawan::all();
+        if($request->filled('jam_in')){
+            $data['jam_in'] = $request->jam_in;
+        }
 
-    //     foreach ($karyawans as $karyawan) {
-    //         $nik = $karyawan->nik;
+        if($request->filled('jam_out')){
+            $data['jam_out'] = $request->jam_out;
+        }
 
-    //         // Hitung total hari kerja
-    //         $jumlahHariKerja = DB::table('jam_kerja')
-    //             ->where('nik', $nik)
-    //             ->whereMonth('tanggal_kerja', $bulan)
-    //             ->whereYear('tanggal_kerja', $tahun)
-    //             ->count();
+        $presensi->update($data);
 
-    //         if ($jumlahHariKerja == 0) continue;
+        return redirect()->route('admin.monitoring')->with('success', 'Data Presensi Berhasil diupdate');
+        // return redirect()->with('success', 'Data Berhasil di Update');
+    }
 
-    //         // Hitung jumlah hadir
-    //         $jumlahHadir = DB::table('presensi')
-    //             ->where('nik', $nik)
-    //             ->whereMonth('tanggal_presensi', $bulan)
-    //             ->whereYear('tanggal_presensi', $tahun)
-    //             ->count();
+    public function deleteDataPresensi($id){
+        $presensi = Presensi::findOrFail($id);
+        $presensi->delete();
 
-    //         // Hitung keterlambatan (contoh jika lewat jam 08:00 dianggap telat)
-    //         $jumlahTelat = DB::table('presensi')
-    //             ->where('nik', $nik)
-    //             ->whereMonth('tanggal_presensi', $bulan)
-    //             ->whereYear('tanggal_presensi', $tahun)
-    //             ->whereTime('jam_in', '>', '08:00:00')
-    //             ->count();
-
-    //         $persenHadir = round(($jumlahHadir / $jumlahHariKerja) * 100, 2);
-    //         $persenTelat = round(($jumlahTelat / $jumlahHariKerja) * 100, 2);
-
-    //         // Simpan atau update ke rekap_presensi
-    //         RekapKehadiran::updateOrCreate(
-    //             [
-    //                 'nik' => $nik,
-    //                 'bulan' => $bulan,
-    //                 'tahun' => $tahun
-    //             ],
-    //             [
-    //                 'persentase_kehadiran' => $persenHadir,
-    //                 'persentase_keterlambatan' => $persenTelat,
-    //                 'created_at' => now(),
-    //                 'updated_at' => now(),
-    //             ]
-    //         );
-    //     }
-
-    //     return redirect()->route('rekap.kehadiran')->with('success', 'Data rekap berhasil disinkronkan.');
-    // }   
+        return redirect()->route('admin.monitoring')->with('success', 'Data Presensi Berhasil dihapus');
+    }
 }

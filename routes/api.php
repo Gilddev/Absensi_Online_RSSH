@@ -19,4 +19,5 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::middleware('auth:sanctum')->get('/rekap-presensi/{nik}', [RekapKehadiranController::class, 'show']);
+Route::middleware('auth:sanctum')->get('/rekap-presensi/{nik}', [RekapKehadiranController::class, 'showPersentase']);
+Route::middleware('auth:sanctum')->get('/cek-kehadiran-kuliah-subuh/{nik}/{bulan}/{tahun}', [RekapKehadiranController::class, 'showKuliahSubuh']);

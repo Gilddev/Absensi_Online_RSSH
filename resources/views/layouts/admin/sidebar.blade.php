@@ -193,6 +193,9 @@
                       <a class="dropdown-item" href="/presensi/monitoringjadwal">
                         Monitoring Jadwal
                       </a>
+                      <a class="dropdown-item" href="/presensi/monitoringpersentase">
+                        Monitoring Persentase
+                      </a>
                 </div>
               </li>
 
@@ -241,7 +244,7 @@
                       <a class="dropdown-item" href="/presensi/rekapkuliahsubuh">
                         Rekap Kuliah Subuh
                       </a>
-                      <a class="dropdown-item" href="/presensi/cetakrekapkehadiran">
+                      <a class="dropdown-item" href="/presensi/rekappersentase">
                         Rekap Persentase
                       </a>
                     </div>

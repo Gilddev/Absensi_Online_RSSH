@@ -21,6 +21,19 @@
             <div class="col-12">
                 <div class="card">  
                     <div class="card-body">
+
+                        @if (Session::get('success'))
+                            <div class="alert alert-success">
+                                {{ Session::get('success') }}
+                            </div>
+                        @endif
+
+                        @if (Session::get('warnig'))
+                            <div class="alert alert-warning">
+                                {{ Session::get('warning') }}
+                            </div>
+                        @endif
+                        
                         <div class="row">
                                 <div class="col-12">
                                 <div class="input-icon">
@@ -48,13 +61,12 @@
                                             <th>Status</th>
                                             <th>Jenis</th>
                                             <th>Keterangan</th>
-                                            <th>Detail</th>
+                                            <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody id="loadpresensi"></tbody>
                         </table>
                     </div>
-                    
                 </div>
             </div>
         </div>

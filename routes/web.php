@@ -11,6 +11,7 @@ use App\Http\Controllers\IzinsakitController;
 use App\Http\Controllers\AbsensiLainnyaController;
 use App\Http\Controllers\Api\RekapKehadiranController as ApiRekapKehadiranController;
 use App\Http\Controllers\PresensiKuliahSubuhController;
+use GuzzleHttp\Middleware;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\AbstractRouteCollection;
 
@@ -142,7 +143,7 @@ Route::middleware(['auth:user']) -> group(function(){
     Route::post('/ruangan/{kode_ruangan}/delete', [RuanganController::class, 'delete']);
 
     //presensi monitoring
-    Route::get('/presensi/monitoring', [PresensiController::class, 'monitoring']);
+    Route::get('/presensi/monitoring', [PresensiController::class, 'monitoring'])->name('admin.monitoring');
     Route::get('/presensi/monitoringjadwal', [PresensiController::class, 'monitoringjadwal']);
 
     Route::get('/presensi/monitoringjadwal', [PresensiController::class, 'getJadwalKerjaHariIni']);
@@ -171,6 +172,7 @@ Route::middleware(['auth:user']) -> group(function(){
     Route::post('/presensi/cetakrekapkuliahsubuh', [PresensiKuliahSubuhController::class, 'cetakrekapKuliahSubuh']);
 
     //fungsi rekap persentase kehadiran
+    Route::get('/presensi/monitoringpresensi', [PresensiController::class, 'tampilkanRekap'])->name('rekap.monitoring');
     Route::get('/presensi/rekap-kehadiran', [PresensiController::class, 'tampilkanRekap'])->name('rekap.kehadiran');
     Route::post('/presensi/rekap-kehadiran/sinkronisasi', [PresensiController::class, 'hitungPersentaseKehadiran'])->name('rekap.kehadiran.sinkronisasi');
 
@@ -189,8 +191,15 @@ Route::middleware(['auth:user']) -> group(function(){
     // Route::post('/konfigurasi/updatesetjamkerja', [KonfigurasiController::class, 'updatesetjamkerja']);
 
     //tampilan cetak rekap dan tombol sync ulang
-    Route::get('presensi/cetakrekapkehadiran', [RekapKehadiranController::class, 'cetakRekapKehadiran'])->name('cetak.rekap.kehadiran');
-    Route::get('presensi/tombolrekapkehadiran', [RekapKehadiranController::class, 'sync'])->name('rekap-kehadiran.sync');
+    Route::get('/presensi/monitoringpersentase', [RekapKehadiranController::class, 'monitoringPersentase'])->name('rekap.monitoring');
+    Route::get('/presensi/rekappersentase', [RekapKehadiranController::class, 'rekapPersentase'])->name('rekap.persentase');
+    Route::post('/presensi/cetakrekappersentase', [RekapKehadiranController::class, 'cetakRekapPersentase'])->name('cetak.rekap.persentase');
+    Route::get('/presensi/tombolrekapkehadiran', [RekapKehadiranController::class, 'sync'])->name('rekap-kehadiran.sync');
+
+    //konfigurasi edit dan hapus data presensi
+    Route::get('/presensi/editdatapresensi/{id}', [PresensiController::class, 'indexEditDataPresensi'])->name('admin.indexEditDataPresensi');
+    Route::put('/presensi/storeeditdatapresensi/{id}', [PresensiController::class, 'updateEditDataPresensi'])->name('admin.updateEditDataPresensi');
+    Route::delete('/presensi/hapusdatapresensi/{id}', [PresensiController::class, 'deleteDataPresensi'])->name('admin.deleteDataPresensi');
 });
 
 Route::middleware(['multi_auth'])->group(function () {
